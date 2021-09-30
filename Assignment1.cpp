@@ -67,16 +67,19 @@ void OutputToFile(vector<vector<int>> matrixvector, string file_name) {
 vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B);
 vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>> B);
 vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>> B);
+bool BruteForceCheck();
+
 
 int main()
 {
 
     std::cout << "Hello World!\n";
-    vector<vector<int>> input = ParseInput("Book1.csv");
+    /*vector<vector<int>> input = ParseInput("Book1.csv");
     cout << "Parse Successful\n";
     vector<vector<int>> BF = BruteForce(input, input);
     //vector<vector<int>> RE = RecursiveAlgorithm(input, input);
-    OutputToFile(BF, "test.txt");
+    OutputToFile(BF, "test.txt");*/
+    BruteForceCheck();
 
 }
 
@@ -259,7 +262,119 @@ vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>
     return(C);
 }
 
+//Testing
+bool BruteForceCheck() {
+    bool check3x3;
+    bool check5x5;
+    bool check7x7;
+    bool incorrect_check;
+    ///3x3 Matrix
+    vector<vector<int>> first_vect3x3{
+        {-16, -15, -12},
+        {-20, -9, 2},
+        {9, 17, 18}
+    };
 
+    vector<vector<int>> second_vect3x3{
+        { 7, 8, 12 },
+        { -6, 3, 16 },
+        { -14, -11, -5 }
+    };
+    
+    vector<vector<int>> expect_vect3x3{
+        { 146, -41, -372 },
+        { -114, -209, -394 },
+        { -291, -75, 290 }
+    };
+    
+
+    vector<vector<int>> BruteForceResult3x3 = BruteForce(first_vect3x3, second_vect3x3);
+    check3x3 = equal(expect_vect3x3.begin(), expect_vect3x3.end(), BruteForceResult3x3.begin());
+    cout << "Bruteforce 3x3 Check: " << check3x3 << endl;
+
+    //5x5 Matrix
+    vector<vector<int>> first_vect5x5{
+        {-10, -9, 12, 16, 17},
+        {-15, -9, -6, 0, 16},
+        {-14, -2, -1, 3, 9},
+        {-6, -1, 0, 12, 13},
+        {-17, -12, 1, 2, 20}
+    };
+
+    vector<vector<int>> second_vect5x5{
+        {-8, 9, 10, 13, 16},
+        {-14, -12, -2, 16, 19},
+        {-18, 6, 10, 14, 16},
+        {-14, -8, 2, 13, 14},
+        {-15, -10, -2, 11, 18}
+    };
+
+    vector<vector<int>> expect_vect5x5{
+        {-489, -208, 36, 289, 391},
+        {114,-223,-224,-247,-219},
+        {-19,-222,-158,-90,-74},
+        {-301,-268,-60,205,287},
+        {-42,-219,-172,-153,-96}
+    };
+
+    vector<vector<int>> BruteForceResult5x5 = BruteForce(first_vect5x5, second_vect5x5);
+    check5x5 = equal(expect_vect5x5.begin(), expect_vect5x5.end(), BruteForceResult5x5.begin());
+    cout << "Bruteforce 5x5 Check: " << check5x5 << endl;
+
+    //7x7 Matrix
+    vector<vector<int>> first_vect7x7{
+        {-19, -16, -7, 0, 1, 10, 11},
+        {-17, -15, -12, 1, 7, 12, 19},
+        {-15, -10, -6, -5, -3, -1, 14},
+        {-18, -3, -2, 3, 4, 15, 19},
+        {-19, -16, -14, -12, -3, -1, 14},
+        {-18, -17, -9, 0, 10, 11, 13},
+        {-17, -15, -10, -7, 0, 13, 18}
+    };
+
+    vector<vector<int>> second_vect7x7{
+        {10, 3, -3, 1, 18, 8, -13},
+        {-14, 19, -10, -5, -18, -4, 9},
+        {-13, 16, -1, -15, 9, 11, -17},
+        {-5, -7, -18, -14, 18, 15, 10},
+        {-2, -3, -4, -18, 5, -10, -14},
+        {1, -16, 11, 9, -18, 7, -14},
+        {11, -19, 4, 15, 17, -8, 19}
+    };
+
+    vector<vector<int>> expect_vect7x7{
+        {254, -845, 374, 403, -105, -193, 277},
+        {398, -1109, 375, 491, 16, -331, 395},
+        {252, -537, 298, 450, 7, -310, 479},
+        {89, -777, 257, 333, -161, -196, 366},
+        {435, -742, 504, 694, -155, -511, 543},
+        {309, -974, 366, 316, -26, -302, 187},
+        {416, -997, 552, 693, -180, -344, 346}
+    };
+
+    vector<vector<int>> BruteForceResult7x7 = BruteForce(first_vect7x7, second_vect7x7);
+    check7x7 = equal(expect_vect7x7.begin(), expect_vect7x7.end(), BruteForceResult7x7.begin());
+    cout << "Bruteforce 7x7 Check: " << check7x7 << endl;
+
+    //Check to make sure it can see that something is wrong
+    vector<vector<int>> BruteForceResultIncorrect = BruteForce(first_vect7x7, first_vect7x7);
+    incorrect_check = equal(expect_vect7x7.begin(), expect_vect7x7.end(), BruteForceResultIncorrect.begin());
+    cout << "Bruteforce Inc Check: " << incorrect_check << endl;
+    if (incorrect_check) {
+        cout << "Something is wrong" << endl;
+        return false;
+    }
+
+    if (check3x3 && check5x5 && check7x7) {
+        return true;
+    }
+    else {
+        return false;
+    }
+    /*OutputToFile(BruteForceResult3x3, "test.txt");
+    OutputToFile(expect_vect3x3, "test2.txt");*/
+    
+}
 
 
 
