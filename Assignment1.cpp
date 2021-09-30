@@ -5,6 +5,10 @@
 #include <math.h>
 #include <iomanip>
 #include <array>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <sstream>
 #include "Assignment1.h"
 
 
@@ -18,11 +22,61 @@ int multiple_strassens;
 int add_strassens;
 
 //int** BruteForce(int**, int**);
+
+vector<vector<int>> ParseInput(string fileName) {
+    ifstream inFile(fileName);
+    vector<vector<int>> matrixvector;
+    if (inFile.is_open())
+    {
+        string line;
+        vector<int> temp;
+        int count = 0;
+        while (getline(inFile, line))
+        {
+            stringstream linestream(line);
+            string value;
+            while (getline(linestream, value, ',')) {
+                temp.push_back(stoi(value));   
+            }
+            matrixvector.push_back(temp);
+            temp.clear();
+        }
+    }
+
+    /*for (auto row_obj : matrixvector)
+    {
+        for (auto elem : row_obj)
+        {
+            cout << elem << " ";
+        }
+        cout << endl;
+    }*/
+    return matrixvector;
+}
+
+void OutputToFile(vector<vector<int>> matrixvector, string file_name) {
+    ofstream outfile(file_name);
+    for (auto row_obj : matrixvector)
+    {
+        for (auto elem : row_obj)
+        {
+            outfile << elem << "\t";
+        }
+        outfile << endl;
+    }
+    outfile.close();
+}
+
 int main()
 {
 
     std::cout << "Hello World!\n";
+    vector<vector<int>> input = ParseInput("");
+    OutputToFile(input, "test.txt");
 }
+
+
+
 
 //Brute Force Algorithm
 int** BruteForce(int **A, int **B) { //need to fix array sizes
