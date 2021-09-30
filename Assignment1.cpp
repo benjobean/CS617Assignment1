@@ -18,7 +18,6 @@ int add_recursive;
 int multiple_strassens;
 int add_strassens;
 
-//vector<vector<int>> BruteForce(vector<vector<int>>, vector<vector<int>>);
 
 vector<vector<int>> ParseInput(string fileName) {
     ifstream inFile(fileName);
@@ -116,7 +115,7 @@ vector<vector<int>> Sub(vector<vector<int>> A, vector<vector<int>> B) {
 }
 
 //Brute Force Algorithm
-vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) { //need to fix array sizes
+vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) {
     int n = A.size();
     vector<vector<int>> C;
     for (int i = 1; i <= n; i++) {
@@ -134,7 +133,7 @@ vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) { /
 }
 
 //Recursive Algorithm
-vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>> B) {//need to fix array sizes
+vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>> B) {
     int n = sqrt(A.size());
     vector<vector<int>> C; // initializing and creating of vector C for usage
     for (int i = 1; i <= n; i++) {
