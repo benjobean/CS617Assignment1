@@ -97,10 +97,10 @@ int** RecursiveAlgorithm(int** A, int** B) {//need to fix array sizes
 
         RecursiveAlgorithm(A_11, B_11);
 
-        C_11 = RecursiveAlgorithm(A_11, B_11) + RecursiveAlgorithm(A_12, B_21);
-        C_12 = RecursiveAlgorithm(A_11, B_12) + RecursiveAlgorithm(A_12, B_22);
-        C_21 = RecursiveAlgorithm(A_21, B_11) + RecursiveAlgorithm(A_22, B_21);
-        C_22 = RecursiveAlgorithm(A_21, B_12) + RecursiveAlgorithm(A_22, B_22);
+        C_11 = Add(RecursiveAlgorithm(A_11, B_11), RecursiveAlgorithm(A_12, B_21));
+        C_12 = Add(RecursiveAlgorithm(A_11, B_12), RecursiveAlgorithm(A_12, B_22));
+        C_21 = Add(RecursiveAlgorithm(A_21, B_11), RecursiveAlgorithm(A_22, B_21));
+        C_22 = Add(RecursiveAlgorithm(A_21, B_12), RecursiveAlgorithm(A_22, B_22));
         add_recursive = add_recursive + (4 * (n / 2) ^ 2);
 
              /*
@@ -181,18 +181,40 @@ C[((n / 2) + 1):n, ((n / 2) + 1):n] <- C.22
 
 //function to copy matrices
 
+
+
+
+
+
 //function to add matrices
+int** Add(int** A, int** B) {
+    int n = sizeof(A) / sizeof(A[0]);
+    int** C;
+    C = new int* [n];
+    for (int z = 0; z < n; z++)
+        C[z] = new int[n];
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            C[i][j] = (A[i][j] + B[i][j]);
+        }
+    }
+    return (C);
+}
+
+
 
 //function to subtract matrices
+int** Sub(int** A, int** B) {
+    int n = sizeof(A) / sizeof(A[0]);
+    int** C;
+    C = new int* [n];
+    for (int z = 0; z < n; z++)
+        C[z] = new int[n];
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            C[i][j] = (A[i][j] - B[i][j]);
+        }
+    }
+    return (C);
+}
 
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
