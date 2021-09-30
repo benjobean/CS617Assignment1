@@ -21,7 +21,7 @@ int add_recursive;
 int multiple_strassens;
 int add_strassens;
 
-//int** BruteForce(int**, int**);
+//vector<vector<int>> BruteForce(vector<vector<int>>, vector<vector<int>>);
 
 vector<vector<int>> ParseInput(string fileName) {
     ifstream inFile(fileName);
@@ -79,16 +79,14 @@ int main()
 
 
 //Brute Force Algorithm
-int** BruteForce(int **A, int **B) { //need to fix array sizes
-    int n = sizeof(A) / sizeof(A[0]);
-    int **C;
-    for (int z = 0; z < n; z++)//need to fix array size and initialize to 0
-        C[z] = new int[n];
+vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) { //need to fix array sizes
+    int n = A.size();
+    vector<vector<int>> C;
     for (int i = 1; i <= n; i++) {
         for (int j = 1; j <= n; j++) {
-            C[i, j] = 0;
+            C[i][j] = 0;
             for (int k = 1; k <= n; k++) {
-                C[i, j] = C[i, j] + (A[i][k] * B[k][j]);
+                C[i][j] = C[i][j] + (A[i][k] * B[k][j]);
                 multiple_bf++;
                 add_bf++;
             }
@@ -99,55 +97,32 @@ int** BruteForce(int **A, int **B) { //need to fix array sizes
 }
 
 //Recursive Algorithm
-int** RecursiveAlgorithm(int** A, int** B) {//need to fix array sizes
-    int n = sqrt((sizeof(A) / sizeof(A[0])));
-    int **C;
-    C = new int*[n];
-    for (int z = 0; z < n; z++)//need to fix array size and initialize to 0
-        C[z] = new int[n];
+vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>> B) {//need to fix array sizes
+    int n = sqrt(A.size());
+    vector<vector<int>> C;
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++) {
+            C[i][j] = 0;
+        }
+    }
     if (n == 1) {
-        C = A * B; //make function to multiply matrices
+        C[0][0] = A[0][0] * B[0][0]; //make function to multiply matrices
         multiple_recursive++;
     }
     else {
-        int** A_11;
-        int** A_12;
-        int** A_21;
-        int** A_22;
-        int** B_11;
-        int** B_12;
-        int** B_21;
-        int** B_22;
-        int** C_11;
-        int** C_12;
-        int** C_21;
-        int** C_22;
-        A_11 = new int*[n];
-        A_12 = new int*[n];
-        A_21 = new int*[n];
-        A_22 = new int*[n];
-        B_11 = new int*[n];
-        B_12 = new int*[n];
-        B_21 = new int*[n];
-        B_22 = new int*[n];
-        C_11 = new int*[n];
-        C_12 = new int*[n];
-        C_21 = new int*[n];
-        C_22 = new int*[n];
-        for (int z = 0; z < n; z++) {//need to fix array size and initialize to 0
-            A_11[z] = new int[n];
-            A_12[z] = new int[n];
-            A_21[z] = new int[n];
-            A_22[z] = new int[n];
-            B_11[z] = new int[n];
-            B_12[z] = new int[n];
-            B_21[z] = new int[n];
-            B_22[z] = new int[n];
-            C_11[z] = new int[n];
-            C_12[z] = new int[n];
-            C_21[z] = new int[n];
-            C_22[z] = new int[n];
-        }
+        vector<vector<int>> A_11;
+        vector<vector<int>> A_12;
+        vector<vector<int>> A_21;
+        vector<vector<int>> A_22;
+        vector<vector<int>> B_11;
+        vector<vector<int>> B_12;
+        vector<vector<int>> B_21;
+        vector<vector<int>> B_22;
+        vector<vector<int>> C_11;
+        vector<vector<int>> C_12;
+        vector<vector<int>> C_21;
+        vector<vector<int>> C_22;
+
 
         RecursiveAlgorithm(A_11, B_11);
 
@@ -158,10 +133,10 @@ int** RecursiveAlgorithm(int** A, int** B) {//need to fix array sizes
         add_recursive = add_recursive + (4 * (n / 2) ^ 2);
 
              /*
-    C[1:(n / 2), 1:(n / 2)]             <- C.11
-    C[1:(n / 2), ((n / 2) + 1):n]       <- C.12
-    C[((n / 2) + 1):n, 1:(n / 2)]       <- C.21
-    C[((n / 2) + 1):n, ((n / 2) + 1):n] <- C.22
+    C[1:(n / 2), 1:(n / 2)]             = C_11
+    C[1:(n / 2), ((n / 2) + 1):n]       = C_12
+    C[((n / 2) + 1):n, 1:(n / 2)]       = C_21
+    C[((n / 2) + 1):n, ((n / 2) + 1):n] = C_22
             
             */
         return (C);
@@ -171,61 +146,67 @@ int** RecursiveAlgorithm(int** A, int** B) {//need to fix array sizes
 
 //Strassen's Algorithm
 
-int StrassensAlgorithm(int A[], int B[]) {//need to fix array sizes
-    int n = sqrt(A.length());
-    int C[] = { 0 }; //need to fix array size and initialize to 0
+vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>> B) {//need to fix array sizes
+    int n = sqrt(A.size());
+    vector<vector<int>> C;
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++) {
+            C[i][j] = 0;
+        }
+    }
     if (n == 1) {
         C = A * B;
         multiple_strassens++;
     }
     else {
-        int A_11[]; // may need to make a function for the copies
-        int A_12[];
-        int A_21[];
-        int A_22[];
-        int B_11[];
-        int B_12[];
-        int B_21[];
-        int B_22[];
+        vector<vector<int>> A_11; // may need to make a function for the copies
+        vector<vector<int>> A_12;
+        vector<vector<int>> A_21;
+        vector<vector<int>> A_22;
+        vector<vector<int>> B_11;
+        vector<vector<int>> B_12;
+        vector<vector<int>> B_21;
+        vector<vector<int>> B_22;
     
         //need to create functions to add and subtract matrixces
-        /*
-    S.1  <- B.12 - B.22
-    S.2  <- A.11 + A.12
-    S.3  <- A.21 + A.22
-    S.4  <- B.21 - B.11
-    S.5  <- A.11 + A.22
-    S.6  <- B.11 + B.22
-    S.7  <- A.12 - A.22
-    S.8  <- B.21 + B.22
-    S.9  <- A.11 - A.21
-    S.10 <- B.11 + B.12
-        */
+        
+        vector<vector<int>> S_1 = Sub(B_12, B_22);
+        vector<vector<int>> S_2 = Add(A_11, A_12);
+        vector<vector<int>> S_2 = Add(A_11, A_12);
+        vector<vector<int>> S_3 = Add(A_21, A_22);
+        vector<vector<int>> S_4 = Sub(B_21, B_11);
+        vector<vector<int>> S_5 = Add(A_11, A_22);
+        vector<vector<int>> S_6 = Add(B_11, B_22);
+        vector<vector<int>> S_7 = Sub(A_12, A_22);
+        vector<vector<int>> S_8 = Add(B_21, B_22);
+        vector<vector<int>> S_9 = Sub(A_11, A_21);
+        vector<vector<int>> S_10 = Add(B_11, B_12);
+        
         add_strassens = add_strassens + (10 * (n / 2) ^ 2);
 
-        int P_1[] = StrassensAlgorithm(A_11, S_1);
-        int P_2[] = StrassensAlgorithm(S_2, B_22);
-        int P_3[] = StrassensAlgorithm(S_3, B_11);
-        int P_4[] = StrassensAlgorithm(A_22, S_4);
-        int P_5[] = StrassensAlgorithm(S_5, S_6);
-        int P_6[] = StrassensAlgorithm(S_7, S_8);
-        int P_7[] = StrassensAlgorithm(S_9, S_10);
+        vector<vector<int>> P_1 = StrassensAlgorithm(A_11, S_1);
+        vector<vector<int>> P_2 = StrassensAlgorithm(S_2, B_22);
+        vector<vector<int>> P_3 = StrassensAlgorithm(S_3, B_11);
+        vector<vector<int>> P_4 = StrassensAlgorithm(A_22, S_4);
+        vector<vector<int>> P_5 = StrassensAlgorithm(S_5, S_6);
+        vector<vector<int>> P_6 = StrassensAlgorithm(S_7, S_8);
+        vector<vector<int>> P_7 = StrassensAlgorithm(S_9, S_10);
 
-        /*
-    C.11 <- P.5 + P.4 - P.2 + P.6
-    C.12 <- P.1 + P.2
-    C.21 <- P.3 + P.4
-    C.22 <- P.5 + P.1 - P.3 - P.7
-        */
+        
+        vector<vector<int>> C_11 = Add(Sub(Add(P_5, P_4), P_2), P_6);
+        vector<vector<int>> C_12 = Add(P_1, P_2);
+        vector<vector<int>> C_21 = Add(P_3, P_4);
+        vector<vector<int>> C_22 = Sub(Sub(Add(P_5, P_1), P_3), P_7);
+        
         add_strassens = add_strassens + (8 * (n / 2) ^ 2);
 
 
 
         /*
-C[1:(n / 2), 1:(n / 2)]             <- C.11
-C[1:(n / 2), ((n / 2) + 1):n]       <- C.12
-C[((n / 2) + 1):n, 1:(n / 2)]       <- C.21
-C[((n / 2) + 1):n, ((n / 2) + 1):n] <- C.22
+C[1:(n / 2), 1:(n / 2)]             = C_11
+C[1:(n / 2), ((n / 2) + 1):n]       = C_12
+C[((n / 2) + 1):n, 1:(n / 2)]       = C_21
+C[((n / 2) + 1):n, ((n / 2) + 1):n] = C_22
 
         */
 
@@ -241,12 +222,9 @@ C[((n / 2) + 1):n, ((n / 2) + 1):n] <- C.22
 
 
 //function to add matrices
-int** Add(int** A, int** B) {
-    int n = sizeof(A) / sizeof(A[0]);
-    int** C;
-    C = new int* [n];
-    for (int z = 0; z < n; z++)
-        C[z] = new int[n];
+vector<vector<int>> Add(vector<vector<int>> A, vector<vector<int>> B) {
+    int n = A.size();
+    vector<vector<int>> C;
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             C[i][j] = (A[i][j] + B[i][j]);
@@ -258,12 +236,9 @@ int** Add(int** A, int** B) {
 
 
 //function to subtract matrices
-int** Sub(int** A, int** B) {
-    int n = sizeof(A) / sizeof(A[0]);
-    int** C;
-    C = new int* [n];
-    for (int z = 0; z < n; z++)
-        C[z] = new int[n];
+vector<vector<int>> Sub(vector<vector<int>> A, vector<vector<int>> B) {
+    int n = A.size();
+    vector<vector<int>> C;
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             C[i][j] = (A[i][j] - B[i][j]);
@@ -271,4 +246,6 @@ int** Sub(int** A, int** B) {
     }
     return (C);
 }
+
+
 
