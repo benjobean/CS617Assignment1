@@ -1,6 +1,3 @@
-//Jonathan Lorray
-//Benjamin Davis
-
 #include <iostream>
 #include <math.h>
 #include <iomanip>
@@ -14,6 +11,8 @@
 #include <iterator>
 //#include "Assignment1.h"
 
+//Benjamin Davis
+//Jonathan Lorray
 
 using namespace std;
 
@@ -73,28 +72,38 @@ void OutputToFile(vector<vector<int>> matrixvector, string file_name) {
 vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B);
 vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>> B);
 vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>> B);
-bool BruteForceCheck(string matrix_file1, string matrix_file2, string expected_file);
+bool BruteForceCheck(string matrix_file1, string matrix_file2, string expected_file, ofstream& outfile);
 vector<vector<int>> CreateMatrix(int n);
-void Phase1Test(string matrix_file1_1, string matrix_file2_1, string expected_file_1, string matrix_file1_2, string matrix_file2_2, string expected_file_2, string matrix_file1_3, string matrix_file2_3, string expected_file_3);
-void TestAlgorithms(string file_name);
+void PrintMatrix(vector<vector<int>> A, ofstream& outfile);
+void TestAlgorithms(ofstream& outfile);
+void Phase1Test(string matrix_file1_1, string matrix_file2_1, string expected_file_1, string matrix_file1_2, string matrix_file2_2, string expected_file_2, string matrix_file1_3, string matrix_file2_3, string expected_file_3, ofstream& outfile);
 void CompareAllAlgorithms(vector<vector<int>> input1, vector<vector<int>> input2, ofstream& outfile, int trial_index);
 
 int main()
 {
+    ofstream outfile("output.txt");
    //Place paths to input files here
-    string matrix_file1_1 = "";
-    string matrix_file2_1 = "";
-    string expected_file_1 = "";
-    string matrix_file1_2 = "";
-    string matrix_file2_2 = "";
-    string expected_file_2 = "";
-    string matrix_file1_3 = "";
-    string matrix_file2_3 = "";
-    string expected_file_3 = "";
+    string matrix_file1_1 = "input/Matrix3x3_1.txt";
+    string matrix_file2_1 = "input/Matrix3x3_2.txt";
+    string expected_file_1 = "input/Matrix3x3_expected.txt";
+    string matrix_file1_2 = "input/Matrix5x5_1.txt";
+    string matrix_file2_2 = "input/Matrix5x5_2.txt";
+    string expected_file_2 = "input/Matrix5x5_expected.txt";
+    string matrix_file1_3 = "input/Matrix7x7_1.txt";
+    string matrix_file2_3 = "input/Matrix7x7_2.txt";
+    string expected_file_3 = "input/Matrix7x7_expected.txt";
     std::cout << "Hello World!\n";
-   
-    Phase1Test(matrix_file1_1, matrix_file2_1, expected_file_1, matrix_file1_2, matrix_file2_2, expected_file_2, matrix_file1_3, matrix_file2_3, expected_file_3);
-    
+    Phase1Test(matrix_file1_1, matrix_file2_1, expected_file_1, matrix_file1_2, matrix_file2_2, expected_file_2, matrix_file1_3, matrix_file2_3, expected_file_3, outfile);
+    vector<vector<int>> input = ParseInput("Book1.csv");
+    cout << "Parse Successful\n";
+    //vector<vector<int>> BF = BruteForce(input, input);
+    //vector<vector<int>> RE = RecursiveAlgorithm(input, input);
+    //vector<vector<int>> SA = StrassensAlgorithm(input, input);
+    //OutputToFile(SA, "test.txt");
+    //BruteForceCheck();
+    vector<vector<int>> temp = CreateMatrix(8);
+    //OutputToFile(temp, "MatrixCreation.txt");
+
 }
 
 //function to copy matrices
@@ -107,6 +116,7 @@ void Partition(vector<vector<int>>& C, vector<vector<int>> A, int startx, int st
             C[i][j] = A[countx][county];
             county++;
         }
+        county = 0;
         countx++;
     }
 
@@ -115,18 +125,32 @@ void Partition(vector<vector<int>>& C, vector<vector<int>> A, int startx, int st
 }
 
 vector<vector<int>> Copy(vector<vector<int>> A, int startx, int starty, int endx, int endy) {
-    int n = (endx - startx); //A.size();
-    vector<vector<int>> C(n, vector<int>(n, 0));
-    int countx = 0;
-    int county = 0;
+    vector<vector<int>> C;
+    vector<int> temp;
+    
     for (int i = startx; i <= endx; i++) {
 
         for (int j = starty; j <= endy; j++) {
-            C[countx][county] = A[i][j];
-            county++;
+            
+            temp.push_back((A[i][j])); 
         }
-        countx++;
+        C.push_back(temp);
+        temp.clear();
     }
+    if (C.size() % 2 == 1 && C.size() != 1) {
+        for (int i = 0; i < C[0].size(); i++) {
+            temp.push_back(0);
+            //cout << temp[i] << " ";
+        }
+        
+        C.push_back(temp);
+        for (int i = 0; i < C.size(); i++) {
+            C[i].push_back(0);
+            //cout << C[i][C.size()-1] << endl;
+        }
+    }
+    
+
     return(C);
 }
 
@@ -140,6 +164,17 @@ vector<vector<int>> Add(vector<vector<int>> A, vector<vector<int>> B) {
         }
     }
     return (C);
+}
+void PrintMatrix(vector<vector<int>> A, ofstream& outfile) {
+    int n = A.size();
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            outfile << A[i][j] << " ";
+        }
+        outfile << endl;
+    }
+    outfile << endl;
+    return;
 }
 
 
@@ -159,7 +194,7 @@ vector<vector<int>> Sub(vector<vector<int>> A, vector<vector<int>> B) {
 //Brute Force Algorithm
 vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) {
     int n = A.size();
-    //cout << "n =" << n << endl;
+    cout << "n =" << n << endl;
     vector<vector<int>> C(n, vector<int>(n, 0)); 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -177,22 +212,25 @@ vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) {
 
 //Recursive Algorithm
 vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>> B) {
-    int n = sqrt(A.size());
-    cout << "n is = " << n << endl;
+    int n = A.size();
+    //PrintMatrix(A);
+    //cout << "n is = " << n << endl;
     vector<vector<int>> C(n, vector<int>(n, 0));
+
     if (n == 1) {
         C[0][0] = A[0][0] * B[0][0]; // base case for recursion
+
         multiple_recursive++;  // add multiplications for counters
     }
     else {
-        vector<vector<int>> A_11 = Copy(A, 0, 0, (n / 2), (n / 2)); // initializing vectors
-        vector<vector<int>> A_12 = Copy(A, 0, (n / 2 + 1), (n / 2), n);
-        vector<vector<int>> A_21 = Copy(A, ((n / 2) + 1), 0, n, (n / 2));
-        vector<vector<int>> A_22 = Copy(A, ((n / 2) + 1), ((n / 2) + 1), n, n);
-        vector<vector<int>> B_11 = Copy(B, 0, 0, (n / 2), (n / 2));
-        vector<vector<int>> B_12 = Copy(B, 0, (n / 2 + 1), (n / 2), n);
-        vector<vector<int>> B_21 = Copy(B, ((n / 2) + 1), 0, n, (n / 2));
-        vector<vector<int>> B_22 = Copy(B, ((n / 2) + 1), ((n / 2) + 1), n, n);
+        vector<vector<int>> A_11 = Copy(A, 0, 0, (n / 2) - 1, (n / 2) - 1); // initializing vectors
+        vector<vector<int>> A_12 = Copy(A, 0, ((n / 2)), (n / 2)-1, n-1);
+        vector<vector<int>> A_21 = Copy(A, ((n / 2)), 0, n - 1, (n / 2) - 1);
+        vector<vector<int>> A_22 = Copy(A, ((n / 2)), ((n / 2)), n-1, n-1);
+        vector<vector<int>> B_11 = Copy(B, 0, 0, (n / 2)-1, (n / 2) - 1);
+        vector<vector<int>> B_12 = Copy(B, 0, (n / 2), (n / 2)-1, n - 1);
+        vector<vector<int>> B_21 = Copy(B, ((n / 2)), 0, n - 1, (n / 2) - 1);
+        vector<vector<int>> B_22 = Copy(B, ((n / 2)), ((n / 2)), n - 1, n - 1);
         vector<vector<int>> C_11;
         vector<vector<int>> C_12;
         vector<vector<int>> C_21;
@@ -205,10 +243,10 @@ vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>
         add_recursive = add_recursive + (4 * (n / 2) ^ 2);  // additions for counters
 
 
-        Partition(C, C_11, 0, 0, (n / 2), (n / 2)); // Combining of sub matrices
-        Partition(C, C_12, 0, (n / 2 + 1), (n / 2), n);
-        Partition(C, C_21, ((n / 2) + 1), 0, n, (n / 2));
-        Partition(C, C_22, ((n / 2) + 1), ((n / 2) + 1), n, n);
+        Partition(C, C_11, 0, 0, ((n / 2)-1), ((n / 2)-1)); // Combining of sub matrices
+        Partition(C, C_12, 0, (n / 2), (n / 2)-1, n-1);
+        Partition(C, C_21, (n / 2), 0, n-1, ((n / 2)-1));
+        Partition(C, C_22, (n / 2), (n / 2), n-1, n-1);
 
 
 
@@ -219,21 +257,21 @@ vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>
 //Strassen's Algorithm
 
 vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>> B) {//need to fix array sizes
-    int n = sqrt(A.size());
+    int n = A.size();
     vector<vector<int>> C(n, vector<int>(n, 0)); 
     if (n == 1) {
         C[0][0] = A[0][0] * B[0][0]; //base case for recursion
         multiple_strassens++;
     }
     else {
-        vector<vector<int>> A_11 = Copy(A, 0, 0, (n / 2), (n / 2)); // initializing vectors
-        vector<vector<int>> A_12 = Copy(A, 0, (n / 2 + 1), (n / 2), n);
-        vector<vector<int>> A_21 = Copy(A, ((n / 2) + 1), 0, n, (n / 2));
-        vector<vector<int>> A_22 = Copy(A, ((n / 2) + 1), ((n / 2) + 1), n, n);
-        vector<vector<int>> B_11 = Copy(B, 0, 0, (n / 2), (n / 2));
-        vector<vector<int>> B_12 = Copy(B, 0, (n / 2 + 1), (n / 2), n);
-        vector<vector<int>> B_21 = Copy(B, ((n / 2) + 1), 0, n, (n / 2));
-        vector<vector<int>> B_22 = Copy(B, ((n / 2) + 1), ((n / 2) + 1), n, n);
+        vector<vector<int>> A_11 = Copy(A, 0, 0, (n / 2) - 1, (n / 2) - 1); // initializing vectors
+        vector<vector<int>> A_12 = Copy(A, 0, ((n / 2)), (n / 2) - 1, n - 1);
+        vector<vector<int>> A_21 = Copy(A, ((n / 2)), 0, n - 1, (n / 2) - 1);
+        vector<vector<int>> A_22 = Copy(A, ((n / 2)), ((n / 2)), n - 1, n - 1);
+        vector<vector<int>> B_11 = Copy(B, 0, 0, (n / 2) - 1, (n / 2) - 1);
+        vector<vector<int>> B_12 = Copy(B, 0, (n / 2), (n / 2) - 1, n - 1);
+        vector<vector<int>> B_21 = Copy(B, ((n / 2)), 0, n - 1, (n / 2) - 1);
+        vector<vector<int>> B_22 = Copy(B, ((n / 2)), ((n / 2)), n - 1, n - 1);
 
 
         vector<vector<int>> S_1 = Sub(B_12, B_22); //Strassions algorithm performing additions and subtractions of sub matrices
@@ -268,10 +306,10 @@ vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>
 
 
 
-        Partition(C, C_11, 0, 0, (n / 2), (n / 2));  // combining of sub matrices
-        Partition(C, C_12, 0, (n / 2 + 1), (n / 2), n);
-        Partition(C, C_21, ((n / 2) + 1), 0, n, (n / 2));
-        Partition(C, C_22, ((n / 2) + 1), ((n / 2) + 1), n, n);
+        Partition(C, C_11, 0, 0, ((n / 2) - 1), ((n / 2) - 1)); // Combining of sub matrices
+        Partition(C, C_12, 0, (n / 2), (n / 2) - 1, n - 1);
+        Partition(C, C_21, (n / 2), 0, n - 1, ((n / 2) - 1));
+        Partition(C, C_22, (n / 2), (n / 2), n - 1, n - 1);
     }
     return(C);
 }
@@ -280,13 +318,13 @@ vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>
 // =================================================================================================
 //TODO: Change BruteForceCheck() to have the expected matrices be read in from a text file
 //==================================================================================================
-void Phase1Test(string matrix_file1_1, string matrix_file2_1, string expected_file_1, string matrix_file1_2, string matrix_file2_2, string expected_file_2, string matrix_file1_3, string matrix_file2_3, string expected_file_3) {
-    BruteForceCheck(matrix_file1_1, matrix_file2_1, expected_file_1);
-    BruteForceCheck(matrix_file1_2, matrix_file2_2, expected_file_2);
-    BruteForceCheck(matrix_file1_3, matrix_file2_3, expected_file_3);
+void Phase1Test(string matrix_file1_1, string matrix_file2_1, string expected_file_1, string matrix_file1_2, string matrix_file2_2, string expected_file_2, string matrix_file1_3, string matrix_file2_3, string expected_file_3, ofstream& outfile) {
+    BruteForceCheck(matrix_file1_1, matrix_file2_1, expected_file_1, outfile);
+    BruteForceCheck(matrix_file1_2, matrix_file2_2, expected_file_2, outfile);
+    BruteForceCheck(matrix_file1_3, matrix_file2_3, expected_file_3, outfile);
 }
 
-bool BruteForceCheck(string matrix_file1, string matrix_file2, string expected_file) {
+bool BruteForceCheck(string matrix_file1, string matrix_file2, string expected_file, ofstream& outfile) {
     bool result;
     bool check5x5;
     bool check7x7;
@@ -310,21 +348,29 @@ bool BruteForceCheck(string matrix_file1, string matrix_file2, string expected_f
         { -291, -75, 290 }
     };*/
     vector<vector<int>> first_vect = ParseInput(matrix_file1);
+    outfile << "Matrix size " << first_vect.size() << " Input Matix 1:" << endl;
+    PrintMatrix(first_vect, outfile);
 
     vector<vector<int>> second_vect = ParseInput(matrix_file2);
+    outfile << "Matrix size " << second_vect.size() << " Input Matix 2:" << endl;
+    PrintMatrix(second_vect, outfile);
 
     vector<vector<int>> expect_vect = ParseInput(expected_file);
+    outfile << "Matrix size " << expect_vect.size() << " Expected Result Matix:" << endl;
+    PrintMatrix(expect_vect, outfile);
 
     vector<vector<int>> BruteForceResult = BruteForce(first_vect, second_vect);
+    outfile << "Matrix size " << BruteForceResult.size() << " Brute Force Result Matix:" << endl;
+    PrintMatrix(BruteForceResult, outfile);
     result = equal(expect_vect.begin(), expect_vect.end(), BruteForceResult.begin());
     cout << "Bruteforce Check: " << result << endl;
 
     if (result) {
-        cout << "Comparison OK" << endl;
+        outfile << "Comparison OK\n" << endl;
         return true;
     }
     else {
-        cout << "Comparison Error" << endl;
+        outfile << "Comparison Error\n" << endl;
         return false;
     }
 
@@ -434,8 +480,8 @@ vector<vector<int>> CreateMatrix(int n) {
     return newMatrix;
 }
 
-void TestAlgorithms(string file_name) {
-    ofstream outfile(file_name);
+void TestAlgorithms(ofstream& outfile) {
+    //ofstream outfile(file_name);
     vector<int> n_values{ 1, 2, 4, 8, 16, 32, 64, 128, 256 };
     for (int i : n_values) {
         for (int j = 0; j < 100; j++) {

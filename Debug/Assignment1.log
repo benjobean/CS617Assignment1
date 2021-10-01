@@ -1,0 +1,7 @@
+﻿  Assignment1.cpp
+C:\Users\jonlo\source\repos\CS617Assignment1\Assignment1.cpp(141,27): warning C4018: '<': signed/unsigned mismatch
+C:\Users\jonlo\source\repos\CS617Assignment1\Assignment1.cpp(147,27): warning C4018: '<': signed/unsigned mismatch
+C:\Users\jonlo\source\repos\CS617Assignment1\Assignment1.cpp(329,10): warning C4101: 'check5x5': unreferenced local variable
+C:\Users\jonlo\source\repos\CS617Assignment1\Assignment1.cpp(331,10): warning C4101: 'incorrect_check': unreferenced local variable
+C:\Users\jonlo\source\repos\CS617Assignment1\Assignment1.cpp(330,10): warning C4101: 'check7x7': unreferenced local variable
+  Assignment1.vcxproj -> C:\Users\jonlo\source\repos\CS617Assignment1\Debug\Assignment1.exe
