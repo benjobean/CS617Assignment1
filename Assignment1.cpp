@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <random>
+#include <algorithm>
+#include <iterator>
 #include "Assignment1.h"
 
 
@@ -68,7 +71,10 @@ vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B);
 vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>> B);
 vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>> B);
 bool BruteForceCheck();
+vector<vector<int>> CreateMatrix(int n);
 
+void TestAlgorithms(string file_name);
+void CompareAllAlgorithms(vector<vector<int>> input1, vector<vector<int>> input2, ofstream& outfile, int trial_index);
 
 int main()
 {
@@ -76,10 +82,12 @@ int main()
     std::cout << "Hello World!\n";
     vector<vector<int>> input = ParseInput("Book1.csv");
     cout << "Parse Successful\n";
-    //vector<vector<int>> BF = BruteForce(input, input);
-    vector<vector<int>> RE = RecursiveAlgorithm(input, input);
-    OutputToFile(RE, "test.txt");
+    vector<vector<int>> BF = BruteForce(input, input);
+    //vector<vector<int>> RE = RecursiveAlgorithm(input, input);
+    OutputToFile(BF, "test.txt");
     //BruteForceCheck();
+    vector<vector<int>> temp = CreateMatrix(8);
+    //OutputToFile(temp, "MatrixCreation.txt");
 
 }
 
@@ -317,6 +325,9 @@ vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>
 }
 
 //Testing
+// =================================================================================================
+//TODO: Change BruteForceCheck() to have the expected matrices be read in from a text file
+//==================================================================================================
 bool BruteForceCheck() {
     bool check3x3;
     bool check5x5;
@@ -352,7 +363,7 @@ bool BruteForceCheck() {
         {-15, -9, -6, 0, 16},
         {-14, -2, -1, 3, 9},
         {-6, -1, 0, 12, 13},
-        {-17, -12, 1, 2, 20}
+        { -17, -12, 1, 2, 20 }
     };
 
     vector<vector<int>> second_vect5x5{
@@ -415,21 +426,123 @@ bool BruteForceCheck() {
     incorrect_check = equal(expect_vect7x7.begin(), expect_vect7x7.end(), BruteForceResultIncorrect.begin());
     cout << "Bruteforce Inc Check: " << incorrect_check << endl;
     if (incorrect_check) {
-        cout << "Something is wrong" << endl;
+        cout << "Comparison Error" << endl;
         return false;
     }
 
     if (check3x3 && check5x5 && check7x7) {
+        cout << "Comparison OK" << endl;
         return true;
     }
     else {
+        cout << "Comparison Error" << endl;
         return false;
     }
     /*OutputToFile(BruteForceResult3x3, "test.txt");
     OutputToFile(expect_vect3x3, "test2.txt");*/
-    
+
 }
 
+//Utility Function to generate matrices
+vector<vector<int>> CreateMatrix(int n) {
+    random_device rnd_device;
+    mt19937 mersenne_engine{ rnd_device() };
+    uniform_int_distribution<int> dist{ 1, 52 };
 
+    auto gen = [&dist, &mersenne_engine]() {
+        return dist(mersenne_engine);
+    };
+
+
+    vector<vector<int>> newMatrix;
+    for (int i = 0; i < n; i++) {
+        vector<int> temp(n);
+        generate(begin(temp), end(temp), gen);
+        newMatrix.push_back(temp);
+    }
+    return newMatrix;
+}
+
+//Utility Function to generate 100 item sets of matrices
+//vector<vector<vector<int>>> GenerateTestSet(int n) {
+//    vector<vector<vector<int>>> test_set;
+//    for (int i = 0; i < 100; i++){
+//        vector<vector<int>> temp = CreateMatrix(n);
+//        test_set.push_back(temp);
+//    }
+//    return test_set;
+//}
+
+void TestAlgorithms(string file_name) {
+    ofstream outfile(file_name);
+    vector<int> n_values{ 1, 2, 4, 8, 16, 32, 64, 128, 256 };
+    for (int i : n_values) {
+        for (int j = 0; j < 100; j++) {
+            vector<vector<int>> input_matrix_1 = CreateMatrix(i);
+            vector<vector<int>> input_matrix_2 = CreateMatrix(i);
+            CompareAllAlgorithms(input_matrix_1, input_matrix_2, outfile, j);
+        }
+    }
+}
+
+//Function to Compare all 3 Algorithms and return any matrices that error out
+void CompareAllAlgorithms(vector<vector<int>> input1, vector<vector<int>> input2, ofstream& outfile, int trial_index) {
+    vector<vector<int>> BruteForce_result = BruteForce(input1, input2);
+    vector<vector<int>> Recursive_result = RecursiveAlgorithm(input1, input2);
+    vector<vector<int>> Strassens_result = StrassensAlgorithm(input1, input2);
+    bool all_match = equal(BruteForce_result.begin(), BruteForce_result.end(), Recursive_result.begin()) && equal(BruteForce_result.begin(), BruteForce_result.end(), Strassens_result.begin());
+    outfile << "n: " << input1.size() << "  |   " << "trial: " << trial_index + 1 << "  |   " << "result: " << all_match << endl;
+    if (!all_match) {
+        outfile << "Input Matrix 1" << endl;
+        for (auto row_obj : input1)
+        {
+            for (auto elem : row_obj)
+            {
+                outfile << elem << "\t";
+            }
+            outfile << endl;
+        }
+        outfile << "Input Matrix 2" << endl;
+        for (auto row_obj : input2)
+        {
+            for (auto elem : row_obj)
+            {
+                outfile << elem << "\t";
+            }
+            outfile << endl;
+        }
+
+        outfile << "Brute Force Result" << endl;
+        for (auto row_obj : BruteForce_result)
+        {
+            for (auto elem : row_obj)
+            {
+                outfile << elem << "\t";
+            }
+            outfile << endl;
+        }
+
+        outfile << "Recursive Result" << endl;
+        for (auto row_obj : Recursive_result)
+        {
+            for (auto elem : row_obj)
+            {
+                outfile << elem << "\t";
+            }
+            outfile << endl;
+        }
+
+        outfile << "Strassens Result" << endl;
+        for (auto row_obj : Strassens_result)
+        {
+            for (auto elem : row_obj)
+            {
+                outfile << elem << "\t";
+            }
+            outfile << endl;
+        }
+
+    }
+}
 
 
