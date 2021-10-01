@@ -84,19 +84,19 @@ int main()
     std::cout << "Hello World!\n";
     vector<vector<int>> input = ParseInput("Book1.csv");
     cout << "Parse Successful\n";
-    //vector<vector<int>> BF = BruteForce(input, input);
+    vector<vector<int>> BF = BruteForce(input, input);
     //vector<vector<int>> RE = RecursiveAlgorithm(input, input);
-    vector<vector<int>> SA = StrassensAlgorithm(input, input);
-    OutputToFile(SA, "test.txt");
+    //vector<vector<int>> SA = StrassensAlgorithm(input, input);
+    OutputToFile(BF, "test.txt");
     //BruteForceCheck();
     vector<vector<int>> temp = CreateMatrix(8);
     //OutputToFile(temp, "MatrixCreation.txt");
 
 }
 
-//function to copy matrices
-void Partition(vector<vector<int>>& C, vector<vector<int>> A, int startx, int starty, int endx, int endy) {
-    int countx = 0;
+//function to Copy a sub-matrix into a larger matrix
+void Copy(vector<vector<int>>& C, vector<vector<int>> A, int startx, int starty, int endx, int endy) {
+    int countx = 0; //counters to interate through all of the sub-matrix
     int county = 0;
     for (int i = startx; i <= endx; i++) {
 
@@ -112,29 +112,26 @@ void Partition(vector<vector<int>>& C, vector<vector<int>> A, int startx, int st
     return;
 }
 
-vector<vector<int>> Copy(vector<vector<int>> A, int startx, int starty, int endx, int endy) {
-    vector<vector<int>> C;
-    vector<int> temp;
+
+vector<vector<int>> Partition(vector<vector<int>> A, int startx, int starty, int endx, int endy) { //function to partition a large matrix into smaller a smaller sub-matrix based on prescribed indicies
+    vector<vector<int>> C; //create sub-matrix
+    vector<int> temp; //temp array for row of sub-matrix
     
     for (int i = startx; i <= endx; i++) {
-
-        for (int j = starty; j <= endy; j++) {
-            
-            temp.push_back((A[i][j])); 
+        for (int j = starty; j <= endy; j++) {  
+            temp.push_back((A[i][j]));      //dynamically create row of sub-matrix
         }
-        C.push_back(temp);
-        temp.clear();
+        C.push_back(temp);                  //add row into larger sub-matrix
+        temp.clear();                       //clear for later use
     }
-    if (C.size() % 2 == 1 && C.size() != 1) {
+    if (C.size() % 2 == 1 && C.size() != 1) { //for loop to add padding into sub-matrix. does not add if sub-matrix is base case
         for (int i = 0; i < C[0].size(); i++) {
             temp.push_back(0);
-            //cout << temp[i] << " ";
         }
         
-        C.push_back(temp);
+        C.push_back(temp);                      //add row of 0's to sub-matrix
         for (int i = 0; i < C.size(); i++) {
-            C[i].push_back(0);
-            //cout << C[i][C.size()-1] << endl;
+            C[i].push_back(0);                  //add 0's to every columb of sub-matrix
         }
     }
     
@@ -142,18 +139,18 @@ vector<vector<int>> Copy(vector<vector<int>> A, int startx, int starty, int endx
     return(C);
 }
 
-//function to add matrices
-vector<vector<int>> Add(vector<vector<int>> A, vector<vector<int>> B) {
+
+vector<vector<int>> Add(vector<vector<int>> A, vector<vector<int>> B) {  //function to add matrices
     int n = A.size();
-    vector<vector<int>> C(n, vector<int>(n, 0));
+    vector<vector<int>> C(n, vector<int>(n, 0)); //initialize matrix to 0's
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            C[i][j] = (A[i][j] + B[i][j]);
+            C[i][j] = (A[i][j] + B[i][j]); //assign new values to matrix based on addition
         }
     }
     return (C);
 }
-void PrintMatrix(vector<vector<int>> A) {
+void PrintMatrix(vector<vector<int>> A) {  //function to print matrices to console (used in testing)
     int n = A.size();
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -167,29 +164,27 @@ void PrintMatrix(vector<vector<int>> A) {
 
 
 
-//function to subtract matrices
-vector<vector<int>> Sub(vector<vector<int>> A, vector<vector<int>> B) {
+
+vector<vector<int>> Sub(vector<vector<int>> A, vector<vector<int>> B) { //function to subtract matrices
     int n = A.size();
-    vector<vector<int>> C(n, vector<int>(n, 0));
+    vector<vector<int>> C(n, vector<int>(n, 0)); //initialize matrix to 0's
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            C[i][j] = (A[i][j] - B[i][j]);
+            C[i][j] = (A[i][j] - B[i][j]);  //assign new values to matrix based on subtraction
         }
     }
     return (C);
 }
 
-//Brute Force Algorithm
-vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) {
+
+vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) { //Brute Force Algorithm
     int n = A.size();
-    cout << "n =" << n << endl;
-    vector<vector<int>> C(n, vector<int>(n, 0)); 
+    vector<vector<int>> C(n, vector<int>(n, 0)); //initialize matrix to 0's
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            C[i][j]=0;
             for (int k = 0; k < n; k++) {
                 C[i][j] = C[i][j] + (A[i][k] * B[k][j]);
-                multiple_bf++;
+                multiple_bf++;                   //counters for metrics on algorithm
                 add_bf++;
             }
         }
@@ -198,28 +193,27 @@ vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) {
     return (C);
 }
 
-//Recursive Algorithm
-vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>> B) {
-    int n = A.size();
-    //PrintMatrix(A);
-    //cout << "n is = " << n << endl;
-    vector<vector<int>> C(n, vector<int>(n, 0));
 
+vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>> B) { //Recursive Algorithm
+    int n = A.size();
+    vector<vector<int>> C(n, vector<int>(n, 0));
     if (n == 1) {
         C[0][0] = A[0][0] * B[0][0]; // base case for recursion
 
-        multiple_recursive++;  // add multiplications for counters
+        multiple_recursive++;  // counter for metrics on algorithm
     }
     else {
-        vector<vector<int>> A_11 = Copy(A, 0, 0, (n / 2) - 1, (n / 2) - 1); // initializing vectors
-        vector<vector<int>> A_12 = Copy(A, 0, ((n / 2)), (n / 2)-1, n-1);
-        vector<vector<int>> A_21 = Copy(A, ((n / 2)), 0, n - 1, (n / 2) - 1);
-        vector<vector<int>> A_22 = Copy(A, ((n / 2)), ((n / 2)), n-1, n-1);
-        vector<vector<int>> B_11 = Copy(B, 0, 0, (n / 2)-1, (n / 2) - 1);
-        vector<vector<int>> B_12 = Copy(B, 0, (n / 2), (n / 2)-1, n - 1);
-        vector<vector<int>> B_21 = Copy(B, ((n / 2)), 0, n - 1, (n / 2) - 1);
-        vector<vector<int>> B_22 = Copy(B, ((n / 2)), ((n / 2)), n - 1, n - 1);
-        vector<vector<int>> C_11;
+        vector<vector<int>> A_11 = Partition(A, 0, 0, (n / 2) - 1, (n / 2) - 1); //partition matrix A into sub matricies by every quarter
+        vector<vector<int>> A_12 = Partition(A, 0, ((n / 2)), (n / 2)-1, n-1);
+        vector<vector<int>> A_21 = Partition(A, ((n / 2)), 0, n - 1, (n / 2) - 1);
+        vector<vector<int>> A_22 = Partition(A, ((n / 2)), ((n / 2)), n-1, n-1);
+
+        vector<vector<int>> B_11 = Partition(B, 0, 0, (n / 2)-1, (n / 2) - 1);   //partition matrix B into sub matricies by every quarter
+        vector<vector<int>> B_12 = Partition(B, 0, (n / 2), (n / 2)-1, n - 1);
+        vector<vector<int>> B_21 = Partition(B, ((n / 2)), 0, n - 1, (n / 2) - 1);
+        vector<vector<int>> B_22 = Partition(B, ((n / 2)), ((n / 2)), n - 1, n - 1);
+
+        vector<vector<int>> C_11; //initializing matricies
         vector<vector<int>> C_12;
         vector<vector<int>> C_21;
         vector<vector<int>> C_22;
@@ -228,13 +222,13 @@ vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>
         C_12 = Add(RecursiveAlgorithm(A_11, B_12), RecursiveAlgorithm(A_12, B_22));
         C_21 = Add(RecursiveAlgorithm(A_21, B_11), RecursiveAlgorithm(A_22, B_21));
         C_22 = Add(RecursiveAlgorithm(A_21, B_12), RecursiveAlgorithm(A_22, B_22));
-        add_recursive = add_recursive + (4 * (n / 2) ^ 2);  // additions for counters
+        add_recursive = add_recursive + (4 * (n / 2) ^ 2);  // Counter for metrics on algorithm
 
 
-        Partition(C, C_11, 0, 0, ((n / 2)-1), ((n / 2)-1)); // Combining of sub matrices
-        Partition(C, C_12, 0, (n / 2), (n / 2)-1, n-1);
-        Partition(C, C_21, (n / 2), 0, n-1, ((n / 2)-1));
-        Partition(C, C_22, (n / 2), (n / 2), n-1, n-1);
+        Copy(C, C_11, 0, 0, ((n / 2)-1), ((n / 2)-1)); // Combining of sub matrices
+        Copy(C, C_12, 0, (n / 2), (n / 2)-1, n-1);
+        Copy(C, C_21, (n / 2), 0, n-1, ((n / 2)-1));
+        Copy(C, C_22, (n / 2), (n / 2), n-1, n-1);
 
 
 
@@ -242,9 +236,9 @@ vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>
     return (C);
 }
 
-//Strassen's Algorithm
 
-vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>> B) {//need to fix array sizes
+
+vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>> B) {  //Strassen's Algorithm
     int n = A.size();
     vector<vector<int>> C(n, vector<int>(n, 0)); 
     if (n == 1) {
@@ -252,14 +246,14 @@ vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>
         multiple_strassens++;
     }
     else {
-        vector<vector<int>> A_11 = Copy(A, 0, 0, (n / 2) - 1, (n / 2) - 1); // initializing vectors
-        vector<vector<int>> A_12 = Copy(A, 0, ((n / 2)), (n / 2) - 1, n - 1);
-        vector<vector<int>> A_21 = Copy(A, ((n / 2)), 0, n - 1, (n / 2) - 1);
-        vector<vector<int>> A_22 = Copy(A, ((n / 2)), ((n / 2)), n - 1, n - 1);
-        vector<vector<int>> B_11 = Copy(B, 0, 0, (n / 2) - 1, (n / 2) - 1);
-        vector<vector<int>> B_12 = Copy(B, 0, (n / 2), (n / 2) - 1, n - 1);
-        vector<vector<int>> B_21 = Copy(B, ((n / 2)), 0, n - 1, (n / 2) - 1);
-        vector<vector<int>> B_22 = Copy(B, ((n / 2)), ((n / 2)), n - 1, n - 1);
+        vector<vector<int>> A_11 = Partition(A, 0, 0, (n / 2) - 1, (n / 2) - 1); // initializing vectors
+        vector<vector<int>> A_12 = Partition(A, 0, ((n / 2)), (n / 2) - 1, n - 1);
+        vector<vector<int>> A_21 = Partition(A, ((n / 2)), 0, n - 1, (n / 2) - 1);
+        vector<vector<int>> A_22 = Partition(A, ((n / 2)), ((n / 2)), n - 1, n - 1);
+        vector<vector<int>> B_11 = Partition(B, 0, 0, (n / 2) - 1, (n / 2) - 1);
+        vector<vector<int>> B_12 = Partition(B, 0, (n / 2), (n / 2) - 1, n - 1);
+        vector<vector<int>> B_21 = Partition(B, ((n / 2)), 0, n - 1, (n / 2) - 1);
+        vector<vector<int>> B_22 = Partition(B, ((n / 2)), ((n / 2)), n - 1, n - 1);
 
 
         vector<vector<int>> S_1 = Sub(B_12, B_22); //Strassions algorithm performing additions and subtractions of sub matrices
@@ -294,10 +288,10 @@ vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>
 
 
 
-        Partition(C, C_11, 0, 0, ((n / 2) - 1), ((n / 2) - 1)); // Combining of sub matrices
-        Partition(C, C_12, 0, (n / 2), (n / 2) - 1, n - 1);
-        Partition(C, C_21, (n / 2), 0, n - 1, ((n / 2) - 1));
-        Partition(C, C_22, (n / 2), (n / 2), n - 1, n - 1);
+        Copy(C, C_11, 0, 0, ((n / 2) - 1), ((n / 2) - 1)); // Combining of sub matrices
+        Copy(C, C_12, 0, (n / 2), (n / 2) - 1, n - 1);
+        Copy(C, C_21, (n / 2), 0, n - 1, ((n / 2) - 1));
+        Copy(C, C_22, (n / 2), (n / 2), n - 1, n - 1);
     }
     return(C);
 }
