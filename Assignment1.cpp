@@ -421,7 +421,7 @@ bool BruteForceCheck(string matrix_file1, string matrix_file2, string expected_f
 void Phase2Test(ofstream& outfile) {
     //ofstream outfile(file_name);
     outfile << "NOTE: result: 1 if the matrices are equal, 0 if there is a discrepency" << endl;
-    vector<int> n_values{ 1, 2, 4, 8, 16, 32, 64, 128, 256 };
+    vector<int> n_values{ 1, 2, 4, 8, 16, 24, 32, 48, 64 };
     for (int i : n_values) {
         for (int j = 0; j < 100; j++) {
             cout << "n = " << i << "\t|\ttrial: " << j << endl;
