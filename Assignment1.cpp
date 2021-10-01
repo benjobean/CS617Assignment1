@@ -74,12 +74,12 @@ int main()
 {
 
     std::cout << "Hello World!\n";
-    /*vector<vector<int>> input = ParseInput("Book1.csv");
+    vector<vector<int>> input = ParseInput("Book1.csv");
     cout << "Parse Successful\n";
-    vector<vector<int>> BF = BruteForce(input, input);
-    //vector<vector<int>> RE = RecursiveAlgorithm(input, input);
-    OutputToFile(BF, "test.txt");*/
-    BruteForceCheck();
+    //vector<vector<int>> BF = BruteForce(input, input);
+    vector<vector<int>> RE = RecursiveAlgorithm(input, input);
+    OutputToFile(RE, "test.txt");
+    //BruteForceCheck();
 
 }
 
@@ -87,12 +87,13 @@ int main()
 void Partition(vector<vector<int>>& C, vector<vector<int>> A, int startx, int starty, int endx, int endy) {
     int countx = 0;
     int county = 0;
-    for (int i = startx; i <= endx; i++) {
+    for (int i = startx; i < endx; i++) {
 
-        for (int j = starty; j <= endy; j++) {
+        for (int j = starty; j < endy; j++) {
             C[i][j] = A[countx][county];
             county++;
         }
+        county = 0;
         countx++;
     }
 
@@ -101,18 +102,69 @@ void Partition(vector<vector<int>>& C, vector<vector<int>> A, int startx, int st
 }
 
 vector<vector<int>> Copy(vector<vector<int>> A, int startx, int starty, int endx, int endy) {
-    int n = (endx - startx); //A.size();
-    vector<vector<int>> C(n, vector<int>(n, 0));
+    //int n = (endx - startx); //A.size();
+    //cout << "Copy n = " << n << endl;
+    vector<vector<int>> C;
+    vector<int> temp;
+    //cout << "C.Size() = " << C.size() << endl;
     int countx = 0;
-    int county = 0;
-    for (int i = startx; i <= endx; i++) {
 
-        for (int j = starty; j <= endy; j++) {
-            C[countx][county] = A[i][j];
+    int county = 0;
+
+    for (int i = startx; i < endx; i++) {
+
+        for (int j = starty; j < endy; j++) {
+            
+            temp.push_back(A[i][j]);
             county++;
         }
+        C.push_back(temp);
+        county = 0;
         countx++;
     }
+    if (C.size() == C[0].size()) {
+        if (C.size() % 2 == 1 && C.size() != 1) {
+            for (int i = 0; i < C[0].size(); i++) {
+                temp.push_back(0);
+            }
+            C.push_back(temp);
+            for (int i = 0; i < C.size(); i++) {
+                C[i].push_back(0);
+            }
+        }        
+    }
+    else if (C.size() < C[0].size()) {
+        vector<int> temp;
+        for (int i = 0; i < C[0].size(); i++) {
+            temp.push_back(0);
+        }
+        C.push_back(temp);
+        if (C.size() % 2 == 1 && C.size()!=1) {
+            for (int i = 0; i < C[0].size(); i++) {
+                temp.push_back(0);
+            }
+            C.push_back(temp);
+            for (int i = 0; i < C.size(); i++) {
+                C[i].push_back(0);
+            }
+        }
+        
+    }
+    else {
+        for (int i = 0; i < C[0].size(); i++) {
+            C[i].push_back(0);
+        }
+        if (C.size() % 2 == 1 && C.size() != 1) {
+            for (int i = 0; i < C[0].size(); i++) {
+                temp.push_back(0);
+            }
+            C.push_back(temp);
+            for (int i = 0; i < C.size(); i++) {
+                C[i].push_back(0);
+            }
+        }
+    }
+
     return(C);
 }
 
@@ -145,7 +197,7 @@ vector<vector<int>> Sub(vector<vector<int>> A, vector<vector<int>> B) {
 //Brute Force Algorithm
 vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) {
     int n = A.size();
-    //cout << "n =" << n << endl;
+    cout << "n =" << n << endl;
     vector<vector<int>> C(n, vector<int>(n, 0)); 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -163,20 +215,22 @@ vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) {
 
 //Recursive Algorithm
 vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>> B) {
-    int n = sqrt(A.size());
+    int n = A.size();
     cout << "n is = " << n << endl;
     vector<vector<int>> C(n, vector<int>(n, 0));
-    if (n == 1) {
+    if (n == 2) {
         C[0][0] = A[0][0] * B[0][0]; // base case for recursion
+
         multiple_recursive++;  // add multiplications for counters
     }
     else {
         vector<vector<int>> A_11 = Copy(A, 0, 0, (n / 2), (n / 2)); // initializing vectors
-        vector<vector<int>> A_12 = Copy(A, 0, (n / 2 + 1), (n / 2), n);
-        vector<vector<int>> A_21 = Copy(A, ((n / 2) + 1), 0, n, (n / 2));
-        vector<vector<int>> A_22 = Copy(A, ((n / 2) + 1), ((n / 2) + 1), n, n);
+        vector<vector<int>> A_12 = Copy(A, 0, (n / 2), ((n / 2)+1), n);
+        vector<vector<int>> A_21 = Copy(A, ((n / 2)+1), 0, n, (n / 2));
+        vector<vector<int>> A_22 = Copy(A, ((n / 2)+1), ((n / 2)+1), n, n);
+        
         vector<vector<int>> B_11 = Copy(B, 0, 0, (n / 2), (n / 2));
-        vector<vector<int>> B_12 = Copy(B, 0, (n / 2 + 1), (n / 2), n);
+        vector<vector<int>> B_12 = Copy(B, 0, (n / 2), ((n / 2) + 1), n);
         vector<vector<int>> B_21 = Copy(B, ((n / 2) + 1), 0, n, (n / 2));
         vector<vector<int>> B_22 = Copy(B, ((n / 2) + 1), ((n / 2) + 1), n, n);
         vector<vector<int>> C_11;
@@ -205,7 +259,7 @@ vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>
 //Strassen's Algorithm
 
 vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>> B) {//need to fix array sizes
-    int n = sqrt(A.size());
+    int n = A.size();
     vector<vector<int>> C(n, vector<int>(n, 0)); 
     if (n == 1) {
         C[0][0] = A[0][0] * B[0][0]; //base case for recursion
