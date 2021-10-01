@@ -11,6 +11,8 @@
 #include <iterator>
 #include "Assignment1.h"
 
+//Benjamin Davis
+//Jonathan Lorray
 
 using namespace std;
 
@@ -72,7 +74,7 @@ vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>
 vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>> B);
 bool BruteForceCheck();
 vector<vector<int>> CreateMatrix(int n);
-
+void PrintMatrix(vector<vector<int>> A);
 void TestAlgorithms(string file_name);
 void CompareAllAlgorithms(vector<vector<int>> input1, vector<vector<int>> input2, ofstream& outfile, int trial_index);
 
@@ -82,9 +84,10 @@ int main()
     std::cout << "Hello World!\n";
     vector<vector<int>> input = ParseInput("Book1.csv");
     cout << "Parse Successful\n";
-    vector<vector<int>> BF = BruteForce(input, input);
+    //vector<vector<int>> BF = BruteForce(input, input);
     //vector<vector<int>> RE = RecursiveAlgorithm(input, input);
-    OutputToFile(BF, "test.txt");
+    vector<vector<int>> SA = StrassensAlgorithm(input, input);
+    OutputToFile(SA, "test.txt");
     //BruteForceCheck();
     vector<vector<int>> temp = CreateMatrix(8);
     //OutputToFile(temp, "MatrixCreation.txt");
@@ -95,9 +98,9 @@ int main()
 void Partition(vector<vector<int>>& C, vector<vector<int>> A, int startx, int starty, int endx, int endy) {
     int countx = 0;
     int county = 0;
-    for (int i = startx; i < endx; i++) {
+    for (int i = startx; i <= endx; i++) {
 
-        for (int j = starty; j < endy; j++) {
+        for (int j = starty; j <= endy; j++) {
             C[i][j] = A[countx][county];
             county++;
         }
@@ -110,68 +113,31 @@ void Partition(vector<vector<int>>& C, vector<vector<int>> A, int startx, int st
 }
 
 vector<vector<int>> Copy(vector<vector<int>> A, int startx, int starty, int endx, int endy) {
-    //int n = (endx - startx); //A.size();
-    //cout << "Copy n = " << n << endl;
     vector<vector<int>> C;
     vector<int> temp;
-    //cout << "C.Size() = " << C.size() << endl;
-    int countx = 0;
+    
+    for (int i = startx; i <= endx; i++) {
 
-    int county = 0;
-
-    for (int i = startx; i < endx; i++) {
-
-        for (int j = starty; j < endy; j++) {
+        for (int j = starty; j <= endy; j++) {
             
-            temp.push_back(A[i][j]);
-            county++;
+            temp.push_back((A[i][j])); 
         }
         C.push_back(temp);
-        county = 0;
-        countx++;
+        temp.clear();
     }
-    if (C.size() == C[0].size()) {
-        if (C.size() % 2 == 1 && C.size() != 1) {
-            for (int i = 0; i < C[0].size(); i++) {
-                temp.push_back(0);
-            }
-            C.push_back(temp);
-            for (int i = 0; i < C.size(); i++) {
-                C[i].push_back(0);
-            }
-        }        
-    }
-    else if (C.size() < C[0].size()) {
-        vector<int> temp;
+    if (C.size() % 2 == 1 && C.size() != 1) {
         for (int i = 0; i < C[0].size(); i++) {
             temp.push_back(0);
-        }
-        C.push_back(temp);
-        if (C.size() % 2 == 1 && C.size()!=1) {
-            for (int i = 0; i < C[0].size(); i++) {
-                temp.push_back(0);
-            }
-            C.push_back(temp);
-            for (int i = 0; i < C.size(); i++) {
-                C[i].push_back(0);
-            }
+            //cout << temp[i] << " ";
         }
         
-    }
-    else {
-        for (int i = 0; i < C[0].size(); i++) {
+        C.push_back(temp);
+        for (int i = 0; i < C.size(); i++) {
             C[i].push_back(0);
-        }
-        if (C.size() % 2 == 1 && C.size() != 1) {
-            for (int i = 0; i < C[0].size(); i++) {
-                temp.push_back(0);
-            }
-            C.push_back(temp);
-            for (int i = 0; i < C.size(); i++) {
-                C[i].push_back(0);
-            }
+            //cout << C[i][C.size()-1] << endl;
         }
     }
+    
 
     return(C);
 }
@@ -186,6 +152,17 @@ vector<vector<int>> Add(vector<vector<int>> A, vector<vector<int>> B) {
         }
     }
     return (C);
+}
+void PrintMatrix(vector<vector<int>> A) {
+    int n = A.size();
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << A[i][j] << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+    return;
 }
 
 
@@ -224,23 +201,24 @@ vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) {
 //Recursive Algorithm
 vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>> B) {
     int n = A.size();
-    cout << "n is = " << n << endl;
+    //PrintMatrix(A);
+    //cout << "n is = " << n << endl;
     vector<vector<int>> C(n, vector<int>(n, 0));
-    if (n == 2) {
+
+    if (n == 1) {
         C[0][0] = A[0][0] * B[0][0]; // base case for recursion
 
         multiple_recursive++;  // add multiplications for counters
     }
     else {
-        vector<vector<int>> A_11 = Copy(A, 0, 0, (n / 2), (n / 2)); // initializing vectors
-        vector<vector<int>> A_12 = Copy(A, 0, (n / 2), ((n / 2)+1), n);
-        vector<vector<int>> A_21 = Copy(A, ((n / 2)+1), 0, n, (n / 2));
-        vector<vector<int>> A_22 = Copy(A, ((n / 2)+1), ((n / 2)+1), n, n);
-        
-        vector<vector<int>> B_11 = Copy(B, 0, 0, (n / 2), (n / 2));
-        vector<vector<int>> B_12 = Copy(B, 0, (n / 2), ((n / 2) + 1), n);
-        vector<vector<int>> B_21 = Copy(B, ((n / 2) + 1), 0, n, (n / 2));
-        vector<vector<int>> B_22 = Copy(B, ((n / 2) + 1), ((n / 2) + 1), n, n);
+        vector<vector<int>> A_11 = Copy(A, 0, 0, (n / 2) - 1, (n / 2) - 1); // initializing vectors
+        vector<vector<int>> A_12 = Copy(A, 0, ((n / 2)), (n / 2)-1, n-1);
+        vector<vector<int>> A_21 = Copy(A, ((n / 2)), 0, n - 1, (n / 2) - 1);
+        vector<vector<int>> A_22 = Copy(A, ((n / 2)), ((n / 2)), n-1, n-1);
+        vector<vector<int>> B_11 = Copy(B, 0, 0, (n / 2)-1, (n / 2) - 1);
+        vector<vector<int>> B_12 = Copy(B, 0, (n / 2), (n / 2)-1, n - 1);
+        vector<vector<int>> B_21 = Copy(B, ((n / 2)), 0, n - 1, (n / 2) - 1);
+        vector<vector<int>> B_22 = Copy(B, ((n / 2)), ((n / 2)), n - 1, n - 1);
         vector<vector<int>> C_11;
         vector<vector<int>> C_12;
         vector<vector<int>> C_21;
@@ -253,10 +231,10 @@ vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>
         add_recursive = add_recursive + (4 * (n / 2) ^ 2);  // additions for counters
 
 
-        Partition(C, C_11, 0, 0, (n / 2), (n / 2)); // Combining of sub matrices
-        Partition(C, C_12, 0, (n / 2 + 1), (n / 2), n);
-        Partition(C, C_21, ((n / 2) + 1), 0, n, (n / 2));
-        Partition(C, C_22, ((n / 2) + 1), ((n / 2) + 1), n, n);
+        Partition(C, C_11, 0, 0, ((n / 2)-1), ((n / 2)-1)); // Combining of sub matrices
+        Partition(C, C_12, 0, (n / 2), (n / 2)-1, n-1);
+        Partition(C, C_21, (n / 2), 0, n-1, ((n / 2)-1));
+        Partition(C, C_22, (n / 2), (n / 2), n-1, n-1);
 
 
 
@@ -274,14 +252,14 @@ vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>
         multiple_strassens++;
     }
     else {
-        vector<vector<int>> A_11 = Copy(A, 0, 0, (n / 2), (n / 2)); // initializing vectors
-        vector<vector<int>> A_12 = Copy(A, 0, (n / 2 + 1), (n / 2), n);
-        vector<vector<int>> A_21 = Copy(A, ((n / 2) + 1), 0, n, (n / 2));
-        vector<vector<int>> A_22 = Copy(A, ((n / 2) + 1), ((n / 2) + 1), n, n);
-        vector<vector<int>> B_11 = Copy(B, 0, 0, (n / 2), (n / 2));
-        vector<vector<int>> B_12 = Copy(B, 0, (n / 2 + 1), (n / 2), n);
-        vector<vector<int>> B_21 = Copy(B, ((n / 2) + 1), 0, n, (n / 2));
-        vector<vector<int>> B_22 = Copy(B, ((n / 2) + 1), ((n / 2) + 1), n, n);
+        vector<vector<int>> A_11 = Copy(A, 0, 0, (n / 2) - 1, (n / 2) - 1); // initializing vectors
+        vector<vector<int>> A_12 = Copy(A, 0, ((n / 2)), (n / 2) - 1, n - 1);
+        vector<vector<int>> A_21 = Copy(A, ((n / 2)), 0, n - 1, (n / 2) - 1);
+        vector<vector<int>> A_22 = Copy(A, ((n / 2)), ((n / 2)), n - 1, n - 1);
+        vector<vector<int>> B_11 = Copy(B, 0, 0, (n / 2) - 1, (n / 2) - 1);
+        vector<vector<int>> B_12 = Copy(B, 0, (n / 2), (n / 2) - 1, n - 1);
+        vector<vector<int>> B_21 = Copy(B, ((n / 2)), 0, n - 1, (n / 2) - 1);
+        vector<vector<int>> B_22 = Copy(B, ((n / 2)), ((n / 2)), n - 1, n - 1);
 
 
         vector<vector<int>> S_1 = Sub(B_12, B_22); //Strassions algorithm performing additions and subtractions of sub matrices
@@ -316,10 +294,10 @@ vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>
 
 
 
-        Partition(C, C_11, 0, 0, (n / 2), (n / 2));  // combining of sub matrices
-        Partition(C, C_12, 0, (n / 2 + 1), (n / 2), n);
-        Partition(C, C_21, ((n / 2) + 1), 0, n, (n / 2));
-        Partition(C, C_22, ((n / 2) + 1), ((n / 2) + 1), n, n);
+        Partition(C, C_11, 0, 0, ((n / 2) - 1), ((n / 2) - 1)); // Combining of sub matrices
+        Partition(C, C_12, 0, (n / 2), (n / 2) - 1, n - 1);
+        Partition(C, C_21, (n / 2), 0, n - 1, ((n / 2) - 1));
+        Partition(C, C_22, (n / 2), (n / 2), n - 1, n - 1);
     }
     return(C);
 }
