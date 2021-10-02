@@ -11,8 +11,10 @@
 #include <iterator>
 //#include "Assignment1.h"
 
-//Benjamin Davis
-//Jonathan Lorray
+// CS 617Assignment1 Finished 10/1/2021
+// Contributers:
+//  Benjamin Davis
+//  Jonathan Lorray
 
 using namespace std;
 
@@ -26,22 +28,20 @@ int add_strassens;
 
 
 
-// Function Prototypes
+// Function Prototypes for assignment
 vector<vector<int>> ParseInput(string fileName);
 void OutputToFile(vector<vector<int>> matrixvector, string file_name);
-void PrintMatrix(vector<vector<int>> A, ofstream& outfile);
-bool CompareMatrices(vector<vector<int>> matrix1, vector<vector<int>> matrix2);
-bool CompareMatrices(vector<vector<int>> matrix1, vector<vector<int>> matrix2, vector<vector<int>> matrix3);
-
-vector<vector<int>> CreateMatrix(int n);
-
 vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B);
 vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>> B);
 vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>> B);
 
+// Matrix functions
 
-
-
+// Test Function Prototypes
+vector<vector<int>> CreateMatrix(int n);
+void PrintMatrix(vector<vector<int>> A, ofstream& outfile);
+bool CompareMatrices(vector<vector<int>> matrix1, vector<vector<int>> matrix2);
+bool CompareMatrices(vector<vector<int>> matrix1, vector<vector<int>> matrix2, vector<vector<int>> matrix3);
 void Phase1Test(string matrix_file1_1, string matrix_file2_1, string expected_file_1, string matrix_file1_2, string matrix_file2_2, string expected_file_2, string matrix_file1_3, string matrix_file2_3, string expected_file_3, ofstream& outfile);
 bool BruteForceCheck(string matrix_file1, string matrix_file2, string expected_file, ofstream& outfile);
 void Phase2Test(ofstream& outfile);
@@ -95,7 +95,7 @@ vector<vector<int>> ParseInput(string fileName) {
     return matrixvector;
 }
 
-//Deprecated Utility function to print a matrix to the output file
+// Deprecated Utility function to print a matrix to the output file
 void OutputToFile(vector<vector<int>> matrixvector, string file_name) {
     ofstream outfile(file_name);
     for (auto row_obj : matrixvector)
@@ -109,7 +109,7 @@ void OutputToFile(vector<vector<int>> matrixvector, string file_name) {
     outfile.close();
 }
 
-//Utility Function to print a matrix to the output file
+// Utility Function to print a matrix to the output file
 void PrintMatrix(vector<vector<int>> A, ofstream& outfile) {
     int n = A.size();
     for (int i = 0; i < n; i++) {
@@ -122,11 +122,11 @@ void PrintMatrix(vector<vector<int>> A, ofstream& outfile) {
     return;
 }
 
-//function to create a matrix partition
+// function to create a matrix partition
 void Partition(vector<vector<int>>& C, vector<vector<int>> A, int startx, int starty, int endx, int endy) {
-    int countx = 0;
+    int countx = 0; // Counts used to iterate through all of matrix A
     int county = 0;
-    for (int i = startx; i <= endx; i++) {
+    for (int i = startx; i <= endx; i++) { // Uses X and Y start and end to interate C to copy in the correct quadrant
 
         for (int j = starty; j <= endy; j++) {
             C[i][j] = A[countx][county];
@@ -145,7 +145,7 @@ vector<vector<int>> Copy(vector<vector<int>> A, int startx, int starty, int endx
     vector<vector<int>> C;
     vector<int> temp;
     
-    for (int i = startx; i <= endx; i++) {
+    for (int i = startx; i <= endx; i++) { // Similar to partition, used to copy the section of A into a smaller Matrix C
 
         for (int j = starty; j <= endy; j++) {
             
@@ -154,16 +154,14 @@ vector<vector<int>> Copy(vector<vector<int>> A, int startx, int starty, int endx
         C.push_back(temp);
         temp.clear();
     }
-    if (C.size() % 2 == 1 && C.size() != 1) {
+    if (C.size() % 2 == 1 && C.size() != 1) { // section of code to pad 0's to make the matrix an even size
         for (int i = 0; i < C[0].size(); i++) {
             temp.push_back(0);
-            //cout << temp[i] << " ";
         }
         
         C.push_back(temp);
         for (int i = 0; i < C.size(); i++) {
             C[i].push_back(0);
-            //cout << C[i][C.size()-1] << endl;
         }
     }
     
@@ -174,7 +172,7 @@ vector<vector<int>> Copy(vector<vector<int>> A, int startx, int starty, int endx
 //function to add matrices
 vector<vector<int>> Add(vector<vector<int>> A, vector<vector<int>> B) {
     int n = A.size();
-    vector<vector<int>> C(n, vector<int>(n, 0));
+    vector<vector<int>> C(n, vector<int>(n, 0)); // iterates through matrices A and B adding them into C
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             C[i][j] = (A[i][j] + B[i][j]);
@@ -186,7 +184,7 @@ vector<vector<int>> Add(vector<vector<int>> A, vector<vector<int>> B) {
 //function to subtract matrices
 vector<vector<int>> Sub(vector<vector<int>> A, vector<vector<int>> B) {
     int n = A.size();
-    vector<vector<int>> C(n, vector<int>(n, 0));
+    vector<vector<int>> C(n, vector<int>(n, 0)); // iterates through matrices A and B subtracting them and placing them into C
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             C[i][j] = (A[i][j] - B[i][j]);
@@ -250,11 +248,10 @@ vector<vector<int>> CreateMatrix(int n) {
 //Brute Force Algorithm
 vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) {
     int n = A.size();
-    //cout << "n =" << n << endl;
     vector<vector<int>> C(n, vector<int>(n, 0)); 
     for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            C[i][j]=0;
+        for (int j = 0; j < n; j++) { // iterates through all matrix A and B to multiply them through every value
+            C[i][j]=0;                // initialize C to 0
             for (int k = 0; k < n; k++) {
                 C[i][j] = C[i][j] + (A[i][k] * B[k][j]);
                 multiple_bf++;
@@ -269,8 +266,6 @@ vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) {
 //Recursive Algorithm
 vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>> B) {
     int n = A.size();
-    //PrintMatrix(A);
-    //cout << "n is = " << n << endl;
     vector<vector<int>> C(n, vector<int>(n, 0));
 
     if (n == 1) {
