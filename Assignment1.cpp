@@ -9,10 +9,12 @@
 #include <random>
 #include <algorithm>
 #include <iterator>
-#include "Assignment1.h"
+//#include "Assignment1.h"
 
-//Benjamin Davis
-//Jonathan Lorray
+// CS 617Assignment1 Finished 10/1/2021
+// Contributers:
+//  Benjamin Davis
+//  Jonathan Lorray
 
 using namespace std;
 
@@ -24,6 +26,53 @@ int multiple_strassens;
 int add_strassens;
 
 
+
+
+// Function Prototypes for assignment
+vector<vector<int>> ParseInput(string fileName);
+void OutputToFile(vector<vector<int>> matrixvector, string file_name);
+vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B);
+vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>> B);
+vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>> B);
+
+// Matrix functions
+
+// Test Function Prototypes
+vector<vector<int>> CreateMatrix(int n);
+void PrintMatrix(vector<vector<int>> A, ofstream& outfile);
+bool CompareMatrices(vector<vector<int>> matrix1, vector<vector<int>> matrix2);
+bool CompareMatrices(vector<vector<int>> matrix1, vector<vector<int>> matrix2, vector<vector<int>> matrix3);
+void Phase1Test(string matrix_file1_1, string matrix_file2_1, string expected_file_1, string matrix_file1_2, string matrix_file2_2, string expected_file_2, string matrix_file1_3, string matrix_file2_3, string expected_file_3, ofstream& outfile);
+bool BruteForceCheck(string matrix_file1, string matrix_file2, string expected_file, ofstream& outfile);
+void Phase2Test(ofstream& outfile);
+void CompareAllAlgorithms(vector<vector<int>> input1, vector<vector<int>> input2, ofstream& outfile, int trial_index);
+
+
+int main()
+{
+    ofstream outfile("output.txt"); //Create output file
+    //Place paths to input files for phase 1 testing here
+    string matrix_file1_1 = "input/Matrix3x3_1.txt";
+    string matrix_file2_1 = "input/Matrix3x3_2.txt";
+    string expected_file_1 = "input/Matrix3x3_expected.txt";
+    string matrix_file1_2 = "input/Matrix5x5_1.txt";
+    string matrix_file2_2 = "input/Matrix5x5_2.txt";
+    string expected_file_2 = "input/Matrix5x5_expected.txt";
+    string matrix_file1_3 = "input/Matrix7x7_1.txt";
+    string matrix_file2_3 = "input/Matrix7x7_2.txt";
+    string expected_file_3 = "input/Matrix7x7_expected.txt";
+    
+    Phase1Test(matrix_file1_1, matrix_file2_1, expected_file_1, matrix_file1_2, matrix_file2_2, expected_file_2, matrix_file1_3, matrix_file2_3, expected_file_3, outfile);
+    Phase2Test(outfile);
+    
+
+}
+
+//======================================================================================================================
+//Utility Functions
+//======================================================================================================================
+
+//Utility function to parse input files
 vector<vector<int>> ParseInput(string fileName) {
     ifstream inFile(fileName);
     vector<vector<int>> matrixvector;
@@ -43,18 +92,10 @@ vector<vector<int>> ParseInput(string fileName) {
             temp.clear();
         }
     }
-
-    /*for (auto row_obj : matrixvector)
-    {
-        for (auto elem : row_obj)
-        {
-            cout << elem << " ";
-        }
-        cout << endl;
-    }*/
     return matrixvector;
 }
 
+// Deprecated Utility function to print a matrix to the output file
 void OutputToFile(vector<vector<int>> matrixvector, string file_name) {
     ofstream outfile(file_name);
     for (auto row_obj : matrixvector)
@@ -68,37 +109,24 @@ void OutputToFile(vector<vector<int>> matrixvector, string file_name) {
     outfile.close();
 }
 
-// Function Prototypes
-vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B);
-vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>> B);
-vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>> B);
-bool BruteForceCheck();
-vector<vector<int>> CreateMatrix(int n);
-void PrintMatrix(vector<vector<int>> A);
-void TestAlgorithms(string file_name);
-void CompareAllAlgorithms(vector<vector<int>> input1, vector<vector<int>> input2, ofstream& outfile, int trial_index);
-
-int main()
-{
-
-    std::cout << "Hello World!\n";
-    vector<vector<int>> input = ParseInput("Book1.csv");
-    cout << "Parse Successful\n";
-    vector<vector<int>> BF = BruteForce(input, input);
-    //vector<vector<int>> RE = RecursiveAlgorithm(input, input);
-    //vector<vector<int>> SA = StrassensAlgorithm(input, input);
-    OutputToFile(BF, "test.txt");
-    //BruteForceCheck();
-    vector<vector<int>> temp = CreateMatrix(8);
-    //OutputToFile(temp, "MatrixCreation.txt");
-
+// Utility Function to print a matrix to the output file
+void PrintMatrix(vector<vector<int>> A, ofstream& outfile) {
+    int n = A.size();
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            outfile << A[i][j] << " ";
+        }
+        outfile << endl;
+    }
+    outfile << endl;
+    return;
 }
 
-//function to Copy a sub-matrix into a larger matrix
-void Copy(vector<vector<int>>& C, vector<vector<int>> A, int startx, int starty, int endx, int endy) {
-    int countx = 0; //counters to interate through all of the sub-matrix
+//function to copy matrices
+void Partition(vector<vector<int>>& C, vector<vector<int>> A, int startx, int starty, int endx, int endy) {
+    int countx = 0;
     int county = 0;
-    for (int i = startx; i <= endx; i++) {
+    for (int i = startx; i <= endx; i++) { // Uses X and Y start and end to interate C to copy in the correct quadrant
 
         for (int j = starty; j <= endy; j++) {
             C[i][j] = A[countx][county];
@@ -142,7 +170,7 @@ vector<vector<int>> Partition(vector<vector<int>> A, int startx, int starty, int
 
 vector<vector<int>> Add(vector<vector<int>> A, vector<vector<int>> B) {  //function to add matrices
     int n = A.size();
-    vector<vector<int>> C(n, vector<int>(n, 0)); //initialize matrix to 0's
+    vector<vector<int>> C(n, vector<int>(n, 0)); // iterates through matrices A and B adding them into C
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             C[i][j] = (A[i][j] + B[i][j]); //assign new values to matrix based on addition
@@ -167,7 +195,7 @@ void PrintMatrix(vector<vector<int>> A) {  //function to print matrices to conso
 
 vector<vector<int>> Sub(vector<vector<int>> A, vector<vector<int>> B) { //function to subtract matrices
     int n = A.size();
-    vector<vector<int>> C(n, vector<int>(n, 0)); //initialize matrix to 0's
+    vector<vector<int>> C(n, vector<int>(n, 0)); // iterates through matrices A and B subtracting them and placing them into C
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             C[i][j] = (A[i][j] - B[i][j]);  //assign new values to matrix based on subtraction
@@ -176,12 +204,65 @@ vector<vector<int>> Sub(vector<vector<int>> A, vector<vector<int>> B) { //functi
     return (C);
 }
 
+//Utility Function for checking if matrices are equal
+bool CompareMatrices(vector<vector<int>> matrix1, vector<vector<int>> matrix2) {
+    bool all_match = true;
+    if (!equal(matrix1.begin(), matrix1.end(), matrix2.begin())) {
+        all_match = false;
+    }
+    return all_match;
+}
 
-vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) { //Brute Force Algorithm
+//Utility Function for checking if matrices are equal(overloaded to 3 matrices for phase 2 of testing)
+bool CompareMatrices(vector<vector<int>> matrix1, vector<vector<int>> matrix2, vector<vector<int>> matrix3) {
+    bool all_match = true;
+    //Compare Brute Force to Recursive
+    if (!equal(matrix1.begin(), matrix1.end(), matrix2.begin())) {
+        all_match = false;
+    }
+    //Compare Brute Force to Strassens
+    else if (!equal(matrix1.begin(), matrix1.end(), matrix3.begin())) {
+        all_match = false;
+    }
+    //Compare Recursive to Strassens
+    else if (!equal(matrix2.begin(), matrix2.end(), matrix3.begin())) {
+        all_match = false;
+    }
+    return all_match;
+}
+
+//Utility Function to generate random matrices
+vector<vector<int>> CreateMatrix(int n) {
+    random_device rnd_device;
+    mt19937 mersenne_engine{ rnd_device() };
+    uniform_int_distribution<int> dist{ 1, 52 };
+
+    auto gen = [&dist, &mersenne_engine]() {
+        return dist(mersenne_engine);
+    };
+
+
+    vector<vector<int>> newMatrix;
+    for (int i = 0; i < n; i++) {
+        vector<int> temp(n);
+        generate(begin(temp), end(temp), gen);
+        newMatrix.push_back(temp);
+    }
+    return newMatrix;
+}
+
+
+//======================================================================================================================
+//Algorithms
+//======================================================================================================================
+
+//Brute Force Algorithm
+vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) {
     int n = A.size();
     vector<vector<int>> C(n, vector<int>(n, 0)); //initialize matrix to 0's
     for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
+        for (int j = 0; j < n; j++) { // iterates through all matrix A and B to multiply them through every value
+            C[i][j]=0;                // initialize C to 0
             for (int k = 0; k < n; k++) {
                 C[i][j] = C[i][j] + (A[i][k] * B[k][j]);
                 multiple_bf++;                   //counters for metrics on algorithm
@@ -197,6 +278,7 @@ vector<vector<int>> BruteForce(vector<vector<int>> A, vector<vector<int>> B) { /
 vector<vector<int>> RecursiveAlgorithm(vector<vector<int>> A, vector<vector<int>> B) { //Recursive Algorithm
     int n = A.size();
     vector<vector<int>> C(n, vector<int>(n, 0));
+
     if (n == 1) {
         C[0][0] = A[0][0] * B[0][0]; // base case for recursion
 
@@ -296,160 +378,62 @@ vector<vector<int>> StrassensAlgorithm(vector<vector<int>> A, vector<vector<int>
     return(C);
 }
 
+//======================================================================================================================
 //Testing
-// =================================================================================================
-//TODO: Change BruteForceCheck() to have the expected matrices be read in from a text file
-//==================================================================================================
-bool BruteForceCheck() {
-    bool check3x3;
-    bool check5x5;
-    bool check7x7;
-    bool incorrect_check;
-    ///3x3 Matrix
-    vector<vector<int>> first_vect3x3{
-        {-16, -15, -12},
-        {-20, -9, 2},
-        {9, 17, 18}
-    };
+//======================================================================================================================
 
-    vector<vector<int>> second_vect3x3{
-        { 7, 8, 12 },
-        { -6, 3, 16 },
-        { -14, -11, -5 }
-    };
-    
-    vector<vector<int>> expect_vect3x3{
-        { 146, -41, -372 },
-        { -114, -209, -394 },
-        { -291, -75, 290 }
-    };
-    
-
-    vector<vector<int>> BruteForceResult3x3 = BruteForce(first_vect3x3, second_vect3x3);
-    check3x3 = equal(expect_vect3x3.begin(), expect_vect3x3.end(), BruteForceResult3x3.begin());
-    cout << "Bruteforce 3x3 Check: " << check3x3 << endl;
-
-    //5x5 Matrix
-    vector<vector<int>> first_vect5x5{
-        {-10, -9, 12, 16, 17},
-        {-15, -9, -6, 0, 16},
-        {-14, -2, -1, 3, 9},
-        {-6, -1, 0, 12, 13},
-        { -17, -12, 1, 2, 20 }
-    };
-
-    vector<vector<int>> second_vect5x5{
-        {-8, 9, 10, 13, 16},
-        {-14, -12, -2, 16, 19},
-        {-18, 6, 10, 14, 16},
-        {-14, -8, 2, 13, 14},
-        {-15, -10, -2, 11, 18}
-    };
-
-    vector<vector<int>> expect_vect5x5{
-        {-489, -208, 36, 289, 391},
-        {114,-223,-224,-247,-219},
-        {-19,-222,-158,-90,-74},
-        {-301,-268,-60,205,287},
-        {-42,-219,-172,-153,-96}
-    };
-
-    vector<vector<int>> BruteForceResult5x5 = BruteForce(first_vect5x5, second_vect5x5);
-    check5x5 = equal(expect_vect5x5.begin(), expect_vect5x5.end(), BruteForceResult5x5.begin());
-    cout << "Bruteforce 5x5 Check: " << check5x5 << endl;
-
-    //7x7 Matrix
-    vector<vector<int>> first_vect7x7{
-        {-19, -16, -7, 0, 1, 10, 11},
-        {-17, -15, -12, 1, 7, 12, 19},
-        {-15, -10, -6, -5, -3, -1, 14},
-        {-18, -3, -2, 3, 4, 15, 19},
-        {-19, -16, -14, -12, -3, -1, 14},
-        {-18, -17, -9, 0, 10, 11, 13},
-        {-17, -15, -10, -7, 0, 13, 18}
-    };
-
-    vector<vector<int>> second_vect7x7{
-        {10, 3, -3, 1, 18, 8, -13},
-        {-14, 19, -10, -5, -18, -4, 9},
-        {-13, 16, -1, -15, 9, 11, -17},
-        {-5, -7, -18, -14, 18, 15, 10},
-        {-2, -3, -4, -18, 5, -10, -14},
-        {1, -16, 11, 9, -18, 7, -14},
-        {11, -19, 4, 15, 17, -8, 19}
-    };
-
-    vector<vector<int>> expect_vect7x7{
-        {254, -845, 374, 403, -105, -193, 277},
-        {398, -1109, 375, 491, 16, -331, 395},
-        {252, -537, 298, 450, 7, -310, 479},
-        {89, -777, 257, 333, -161, -196, 366},
-        {435, -742, 504, 694, -155, -511, 543},
-        {309, -974, 366, 316, -26, -302, 187},
-        {416, -997, 552, 693, -180, -344, 346}
-    };
-
-    vector<vector<int>> BruteForceResult7x7 = BruteForce(first_vect7x7, second_vect7x7);
-    check7x7 = equal(expect_vect7x7.begin(), expect_vect7x7.end(), BruteForceResult7x7.begin());
-    cout << "Bruteforce 7x7 Check: " << check7x7 << endl;
-
-    //Check to make sure it can see that something is wrong
-    vector<vector<int>> BruteForceResultIncorrect = BruteForce(first_vect7x7, first_vect7x7);
-    incorrect_check = equal(expect_vect7x7.begin(), expect_vect7x7.end(), BruteForceResultIncorrect.begin());
-    cout << "Bruteforce Inc Check: " << incorrect_check << endl;
-    if (incorrect_check) {
-        cout << "Comparison Error" << endl;
-        return false;
+//Driver Function for Phase 1 of testing
+void Phase1Test(string matrix_file1_1, string matrix_file2_1, string expected_file_1, string matrix_file1_2, string matrix_file2_2, string expected_file_2, string matrix_file1_3, string matrix_file2_3, string expected_file_3, ofstream& outfile) {
+    bool bf_check1 = BruteForceCheck(matrix_file1_1, matrix_file2_1, expected_file_1, outfile);
+    bool bf_check2 = BruteForceCheck(matrix_file1_2, matrix_file2_2, expected_file_2, outfile);
+    bool bf_check3 = BruteForceCheck(matrix_file1_3, matrix_file2_3, expected_file_3, outfile);
+    if (bf_check1 && bf_check2 && bf_check3) {
+        outfile << "Brute Force Algorithm Validated\n" << endl;
+        cout << "Brute Force Algorithm Validated\n" << endl;
     }
+}
 
-    if (check3x3 && check5x5 && check7x7) {
-        cout << "Comparison OK" << endl;
+//Main Brute Force algorithm validation function
+bool BruteForceCheck(string matrix_file1, string matrix_file2, string expected_file, ofstream& outfile) {
+           
+    vector<vector<int>> first_matrix = ParseInput(matrix_file1);
+    outfile << "Matrix size " << first_matrix.size() << " Input Matix 1:" << endl;
+    PrintMatrix(first_matrix, outfile);
+
+    vector<vector<int>> second_matrix = ParseInput(matrix_file2);
+    outfile << "Matrix size " << second_matrix.size() << " Input Matix 2:" << endl;
+    PrintMatrix(second_matrix, outfile);
+
+    vector<vector<int>> expect_matrix = ParseInput(expected_file);
+    outfile << "Matrix size " << expect_matrix.size() << " Expected Result Matix:" << endl;
+    PrintMatrix(expect_matrix, outfile);
+
+    vector<vector<int>> BruteForceResult = BruteForce(first_matrix, second_matrix);
+    outfile << "Matrix size " << BruteForceResult.size() << " Brute Force Result Matix:" << endl;
+    PrintMatrix(BruteForceResult, outfile);
+    //bool result = equal(expect_vect.begin(), expect_vect.end(), BruteForceResult.begin());
+    bool result = CompareMatrices(expect_matrix, BruteForceResult);
+    cout << "Bruteforce Check: " << result << endl;
+
+    if (result) {
+        outfile << "Comparison OK\n" << endl;
         return true;
     }
     else {
-        cout << "Comparison Error" << endl;
+        outfile << "Comparison Error\n" << endl;
         return false;
     }
-    /*OutputToFile(BruteForceResult3x3, "test.txt");
-    OutputToFile(expect_vect3x3, "test2.txt");*/
 
 }
 
-//Utility Function to generate matrices
-vector<vector<int>> CreateMatrix(int n) {
-    random_device rnd_device;
-    mt19937 mersenne_engine{ rnd_device() };
-    uniform_int_distribution<int> dist{ 1, 52 };
-
-    auto gen = [&dist, &mersenne_engine]() {
-        return dist(mersenne_engine);
-    };
-
-
-    vector<vector<int>> newMatrix;
-    for (int i = 0; i < n; i++) {
-        vector<int> temp(n);
-        generate(begin(temp), end(temp), gen);
-        newMatrix.push_back(temp);
-    }
-    return newMatrix;
-}
-
-//Utility Function to generate 100 item sets of matrices
-//vector<vector<vector<int>>> GenerateTestSet(int n) {
-//    vector<vector<vector<int>>> test_set;
-//    for (int i = 0; i < 100; i++){
-//        vector<vector<int>> temp = CreateMatrix(n);
-//        test_set.push_back(temp);
-//    }
-//    return test_set;
-//}
-
-void TestAlgorithms(string file_name) {
-    ofstream outfile(file_name);
-    vector<int> n_values{ 1, 2, 4, 8, 16, 32, 64, 128, 256 };
+//Driver function for Phase 2 of testing
+void Phase2Test(ofstream& outfile) {
+    //ofstream outfile(file_name);
+    outfile << "NOTE: result: 1 if the matrices are equal, 0 if there is a discrepency" << endl;
+    vector<int> n_values{ 1, 2, 4, 8, 16, 24, 32, 48, 64 };
     for (int i : n_values) {
         for (int j = 0; j < 100; j++) {
+            cout << "n = " << i << "\t|\ttrial: " << j << endl;
             vector<vector<int>> input_matrix_1 = CreateMatrix(i);
             vector<vector<int>> input_matrix_2 = CreateMatrix(i);
             CompareAllAlgorithms(input_matrix_1, input_matrix_2, outfile, j);
@@ -457,64 +441,81 @@ void TestAlgorithms(string file_name) {
     }
 }
 
-//Function to Compare all 3 Algorithms and return any matrices that error out
+//Main Phase 2 testing Function to Compare all 3 Algorithms and output any matrices that error out
 void CompareAllAlgorithms(vector<vector<int>> input1, vector<vector<int>> input2, ofstream& outfile, int trial_index) {
+    cout << "Brute Force: Start" << endl;
     vector<vector<int>> BruteForce_result = BruteForce(input1, input2);
+    cout << "Brute Force: Done" << endl; //Program progress notification
+
+    cout << "Recursive: Start" << endl;
     vector<vector<int>> Recursive_result = RecursiveAlgorithm(input1, input2);
+    cout << "Recursive: Done" << endl;  //Program progress notification
+
+    cout << "Strassen: Start" << endl;
     vector<vector<int>> Strassens_result = StrassensAlgorithm(input1, input2);
-    bool all_match = equal(BruteForce_result.begin(), BruteForce_result.end(), Recursive_result.begin()) && equal(BruteForce_result.begin(), BruteForce_result.end(), Strassens_result.begin());
-    outfile << "n: " << input1.size() << "  |   " << "trial: " << trial_index + 1 << "  |   " << "result: " << all_match << endl;
+    cout << "Strassen: Done" << endl;  //Program progress notification
+    
+    bool all_match = CompareMatrices(BruteForce_result, Recursive_result, Strassens_result);
+    outfile << "n: " << input1.size() << "\t|\t" << "trial: " << trial_index + 1 << "\t|\t" << "result: " << all_match << endl;
     if (!all_match) {
+        cout << "n: " << input1.size() << "\t|\t" << "trial: " << trial_index + 1 << "\t|\t" << "result: " << all_match << endl;//Debug and Notification for mid program run
         outfile << "Input Matrix 1" << endl;
-        for (auto row_obj : input1)
+        PrintMatrix(input1, outfile);
+        /*for (auto row_obj : input1)
         {
             for (auto elem : row_obj)
             {
                 outfile << elem << "\t";
             }
             outfile << endl;
-        }
+        }*/
+
         outfile << "Input Matrix 2" << endl;
-        for (auto row_obj : input2)
+        PrintMatrix(input2, outfile);
+        /*for (auto row_obj : input2)
         {
             for (auto elem : row_obj)
             {
                 outfile << elem << "\t";
             }
             outfile << endl;
-        }
+        }*/
 
-        outfile << "Brute Force Result" << endl;
-        for (auto row_obj : BruteForce_result)
+        outfile << "Brute Force Result Matrix" << endl;
+        PrintMatrix(BruteForce_result, outfile);
+        /*for (auto row_obj : BruteForce_result)
         {
             for (auto elem : row_obj)
             {
                 outfile << elem << "\t";
             }
             outfile << endl;
-        }
+        }*/
 
-        outfile << "Recursive Result" << endl;
-        for (auto row_obj : Recursive_result)
+        outfile << "Recursive Result Matrix" << endl;
+        PrintMatrix(Recursive_result, outfile);
+        /*for (auto row_obj : Recursive_result)
         {
             for (auto elem : row_obj)
             {
                 outfile << elem << "\t";
             }
             outfile << endl;
-        }
+        }*/
 
-        outfile << "Strassens Result" << endl;
-        for (auto row_obj : Strassens_result)
+        outfile << "Strassens Result Matrix" << endl;
+        PrintMatrix(Strassens_result, outfile);
+        /*for (auto row_obj : Strassens_result)
         {
             for (auto elem : row_obj)
             {
                 outfile << elem << "\t";
             }
             outfile << endl;
-        }
+        }*/
 
     }
+    cout << "Trial " << trial_index+1 << " Done" << endl; //Program progress notification
 }
 
 
